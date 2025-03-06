@@ -98,4 +98,4 @@ jobs:
           scp -r -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ./back/* ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:/home/${{ secrets.PROD_USER }}/web/a23gurkaukau.daw.inspedralbes.cat/private/
 
       - name: ✅ Verificar estado del despliegue
-        run: echo "✅ Despliegue finalizado. Status: ${{ job.status }}."
+      - run: echo "🍏 This job's status is ${{ job.status }}."

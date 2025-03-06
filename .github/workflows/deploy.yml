@@ -1,0 +1,101 @@
+name: Preparant per producció
+
+run-name: ${{ github.actor }} està pujant l'aplicació a PROD 🚀
+
+on:
+  push:
+    branches:
+      - dev  # O la rama que prefieras para hacer el despliegue
+
+jobs:
+  Pujar-a-produccio-amb-SCP:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Paso 1: Obtener el código del repositorio
+      - name: Obtenint el codi del repositori
+        uses: actions/checkout@v4
+
+      # Paso 2: Configurar y desplegar Nuxt (Frontend)
+      - name: Instal·lant dependències de Nuxt
+        run: |
+          echo "Instal·lant dependències de Nuxt"
+          cd ./front  # Ajusta según el directorio de tu app Nuxt
+          npm install
+
+      - name: Construint Nuxt
+        run: |
+          echo "Construint Nuxt per producció"
+          cd ./front  # Ajusta según el directorio de tu app Nuxt
+          npm run build
+
+      # Paso 3: Configurar y desplegar Laravel (Backend)
+      - name: Instal·lant dependències de Laravel
+        run: |
+          echo "Instal·lant dependències de Laravel"
+          cd ./back  # Ajusta según el directorio de tu app Laravel
+          composer install --no-interaction --prefer-dist
+
+      - name: Configuració de Laravel (ex. migracions i caché)
+name: Deploy Laravel & Nuxt to Production
+
+run-name: ${{ github.actor }} està pujant l'aplicació a PROD 🚀
+
+on:
+  push:
+    branches:
+      - dev  # Puedes cambiar la rama según necesites
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Obtener código del repositorio
+        uses: actions/checkout@v4
+
+      - name: 🔧 Instalar dependencias de Nuxt
+        run: |
+          echo "Instal·lant dependències de Nuxt"
+          cd ./front
+          npm install
+
+      - name: 🏗️ Construir Nuxt
+        run: |
+          echo "Construint Nuxt per producció"
+          cd ./front
+          npm run build
+
+      - name: 🔧 Instalar dependencias de Laravel
+        run: |
+          echo "Instal·lant dependències de Laravel"
+          cd ./back
+          composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: 🔄 Configurar Laravel (migraciones, caché, optimización)
+        run: |
+          echo "Configurant Laravel"
+          cd ./back
+          php artisan migrate --force
+          php artisan config:cache
+          php artisan route:cache
+          php artisan optimize
+
+      - name: 🚀 Subiendo archivos a producción con SCP
+        run: |
+          echo "Creando clave SSH"
+          echo "${{ secrets.PROD_KEY }}" > ~/prod_key.pem
+          chmod 600 ~/prod_key.pem
+
+          echo "Desplegant a producció..."
+          
+          # Subir Frontend (Nuxt)
+          echo "📤 Subiendo Nuxt..."
+          scp -r -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ./front/.output/public/* ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:/home/${{ secrets.PROD_USER }}/web/a23gurkaukau.cinema.daw.inspedralbes.cat/public_html/
+
+          # Subir Backend (Laravel)
+          echo "📤 Subiendo Laravel..."
+          scp -r -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ./back/* ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:/home/${{ secrets.PROD_USER }}/web/a23gurkaukau.daw.inspedralbes.cat/private/
+
+      - name: ✅ Verificar estado del despliegue
+        run: echo "✅ Despliegue finalizado. Status: ${{ job.status }}."

@@ -46,6 +46,10 @@ Route::prefix('compras')->group(function() {
     // Nueva ruta para que un usuario consulte sus entradas compradas
     Route::get('/usuario/{user_id}', [CompraController::class, 'getComprasPorUsuario']);
 });
+// Rutas para las entradas
+Route::prefix('entradas')->group(function() {
+    Route::get('/', [EntradaController::class, 'index']); // Obtener todos los tipos de entradas
+});
 
 // Rutas para las butacas
 Route::prefix('butacas')->group(function() {

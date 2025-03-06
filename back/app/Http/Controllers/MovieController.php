@@ -31,11 +31,12 @@ class MovieController extends Controller
     public function show($id)
     {
         $movie = Movie::find($id);
-        if (!$movie) {
-            return response()->json(['message' => 'Movie not found'], 404);
+        if ($movie) {
+            return response()->json($movie);
         }
-        return response()->json($movie);
+        return response()->json(['message' => 'Película no encontrada'], 404);
     }
+    
 
     public function update(Request $request, $id)
     {

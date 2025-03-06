@@ -5,7 +5,7 @@ run-name: ${{ github.actor }} està pujant l'aplicació a PROD 🚀
 on:
   push:
     branches:
-      - dev  # Puedes cambiar la rama según necesites
+      - dev 
 
 jobs:
   deploy:

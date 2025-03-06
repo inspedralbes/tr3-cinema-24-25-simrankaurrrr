@@ -48,7 +48,7 @@ jobs:
           echo "APP_KEY=$(php ./back/artisan key:generate --show)" >> ./back/.env
           cat ./back/.env  # Verificar el contenido del archivo .env generado
 
-      # Paso 4: Configurar Laravel (migraciones, caché, optimización)
+      # Paso 4: Configurar Laravel 
       - name: 🔄 Configurar Laravel (migraciones, caché, optimización)
         run: |
           echo "Configurant Laravel"

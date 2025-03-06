@@ -1,0 +1,17 @@
+{
+  "date": "2025-03-06T15:38:36.329Z",
+  "preset": "nitro-dev",
+  "framework": {
+    "name": "nuxt",
+    "version": "3.15.4"
+  },
+  "versions": {
+    "nitro": "2.11.3"
+  },
+  "dev": {
+    "pid": 25772,
+    "workerAddress": {
+      "socketPath": "\\\\.\\pipe\\nitro\\C:\\Users\\simran\\Documents\\cinema\\tr3-cinema-24-25-simrankaurrrr\\front\\.nuxt\\dev\\worker-25772-1-5233-1.sock"
+    }
+  }
+}

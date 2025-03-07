@@ -1,4 +1,4 @@
-name: Deploy Laravel & Nuxt to Production
+name: Deploy Laravel & Nuxt to Production 
 
 run-name: ${{ github.actor }} està pujant l'aplicació a PROD 🚀
 
@@ -48,7 +48,7 @@ jobs:
           echo "APP_KEY=$(php ./back/artisan key:generate --show)" >> ./back/.env
           cat ./back/.env  # Verificar el contenido del archivo .env generado
 
-      # Paso 4: Configurar Laravel 
+      # Paso 4: Configurar Laravel (migraciones, caché, optimización)
       - name: 🔄 Configurar Laravel (migraciones, caché, optimización)
         run: |
           echo "Configurant Laravel"
@@ -71,9 +71,13 @@ jobs:
           echo "📤 Subiendo Nuxt..."
           scp -r -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ./front/.output/public/* ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:/home/${{ secrets.PROD_USER }}/web/a23gurkaukau.cinema.daw.inspedralbes.cat/public_html/
 
-          # Subir Backend (Laravel)
-          echo "📤 Subiendo Laravel..."
-          scp -r -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ./back/* ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:/home/${{ secrets.PROD_USER }}/web/a23gurkaukau.daw.inspedralbes.cat/private/
+          # Subir solo la carpeta `public` de Laravel a una carpeta pública
+          echo "📤 Subiendo Laravel (solo public)..."
+          scp -r -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ./back/public/* ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:/home/${{ secrets.PROD_USER }}/web/a23gurkaukau.cinema.daw.inspedralbes.cat/public_html/
+
+          # Subir el resto del proyecto Laravel a una carpeta privada
+          echo "📤 Subiendo el resto de Laravel a la carpeta privada..."
+          scp -r -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ./back/* ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:/home/${{ secrets.PROD_USER }}/web/a23gurkaukau.cinema.daw.inspedralbes.cat/private/
 
       - name: ✅ Verificar estado del despliegue
         run: echo "🍏 This job's status is ${{ job.status }}."

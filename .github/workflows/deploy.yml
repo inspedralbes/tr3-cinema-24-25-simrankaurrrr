@@ -40,7 +40,7 @@ jobs:
         run: |
           echo "Creando el archivo .env"
           echo "DB_CONNECTION=mysql" >> ./back/.env
-          echo "DB_HOST=127.0.0.1" >> ./back/.env
+          echo "DB_HOST=217.71.201.126" >> ./back/.env
           echo "DB_PORT=3306" >> ./back/.env
           echo "DB_DATABASE=a23gurkaukau_cinema" >> ./back/.env
           echo "DB_USERNAME=a23gurkaukau_a23gurkaukau" >> ./back/.env

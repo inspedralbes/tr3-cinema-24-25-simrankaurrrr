@@ -6,6 +6,20 @@ use Illuminate\Http\Request;
 
 class MovieSessionController extends Controller
 {
+    public function getSessionsByMovieAndDate($movie_id, $session_date)
+    {
+        // Busca las sesiones donde la fecha de la sesión coincide con la fecha proporcionada
+        $sessions = MovieSession::where('movie_id', $movie_id)
+                                ->whereDate('session_date', $session_date) // Aquí usamos whereDate para comparar solo la fecha
+                                ->get();
+    
+        if ($sessions->isEmpty()) {
+            return response()->json(['message' => 'No hay sesiones disponibles para esta película en esta fecha'], 404);
+        }
+    
+        return response()->json($sessions);
+    }
+    
     public function getSessionsByMovie($movie_id) {
         $sessions = MovieSession::where('movie_id', $movie_id)->get();
     

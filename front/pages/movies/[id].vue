@@ -24,10 +24,10 @@
         </div>
       </div>
   
-      <!-- Botón para comprar entradas, incluyendo el ID de la película -->
+      <!-- Botón para ver las butacas y seleccionar la sesión -->
       <div v-if="movie" class="mt-8 text-center">
-        <NuxtLink :to="`/buy-ticket/${movie.id}`" class="bg-green-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700">
-          Comprar Entradas
+        <NuxtLink :to="`/buy-ticket/${movie.id}`" class="bg-blue-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700">
+          Ver Butacas y Sesiones
         </NuxtLink>
       </div>
     </div>

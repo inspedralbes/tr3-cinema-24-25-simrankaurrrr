@@ -11,6 +11,36 @@ const apiClient = axios.create({
 
 // El manager de comunicación con los fetches
 const communicationManager = {
+  // Obtener sesiones de una película para una fecha específica
+  getSessionsByMovieAndDate(movieId, sessionDate) {
+    return apiClient.get(`/sessions/movie/${movieId}/date/${sessionDate}`)
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error fetching sessions for movie and date:', error);
+        throw error;
+      });
+  },
+
+  // Obtener butacas por sesión
+  getButacasPorSesion(sessionId) {
+    return apiClient.get(`/butacas/sesion/${sessionId}`)
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error fetching seats for session:', error);
+        throw error;
+      });
+  },
+
+  // Obtener las sesiones de una película (por película, sin la fecha)
+  getSessionsByMovie(movieId) {
+    return apiClient.get(`/sessions/movie/${movieId}`)
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error fetching sessions for movie:', error);
+        throw error;
+      });
+  },
+
   // Obtener todos los usuarios
   getUsers() {
     return apiClient.get('/users')
@@ -50,23 +80,27 @@ const communicationManager = {
         throw error;
       });
   },
+
+  // Obtener información de una película por ID
   getMovieById(movieId) {
     return apiClient.get(`/movies/${movieId}`)
       .then(response => response.data)
       .catch(error => {
-        console.error('Error fetching movie:', error)
-        throw error
-      })
+        console.error('Error fetching movie:', error);
+        throw error;
+      });
   },
-  // Añadir al communicationManager
-getEntradas() {
+
+  // Obtener entradas
+  getEntradas() {
     return apiClient.get('/entradas')
       .then(response => response.data)
       .catch(error => {
         console.error('Error fetching entries:', error);
         throw error;
       });
-  },    
+  },
+
   // Eliminar usuario por ID
   deleteUser(userId) {
     return apiClient.delete(`/users/${userId}`)
@@ -93,16 +127,6 @@ getEntradas() {
       .then(response => response.data)
       .catch(error => {
         console.error('Error creating movie:', error);
-        throw error;
-      });
-  },
-
-  // Obtener una película por ID
-  getMovieById(movieId) {
-    return apiClient.get(`/movies/${movieId}`)
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error fetching movie:', error);
         throw error;
       });
   },
@@ -229,7 +253,7 @@ getEntradas() {
 
   // Obtener butacas por sesión
   getButacasPorSesion(sessionId) {
-    return apiClient.get(`/butacas/session/${sessionId}`)
+    return apiClient.get(`/butacas/sesion/${sessionId}`)
       .then(response => response.data)
       .catch(error => {
         console.error('Error fetching seats for session:', error);
@@ -237,9 +261,9 @@ getEntradas() {
       });
   },
 
-  // Actualizar butaca por ID
-  updateButaca(butacaId, butacaData) {
-    return apiClient.put(`/butacas/${butacaId}`, butacaData)
+  // Actualizar el estado de la butaca por ID
+  updateButaca(butacaId, estado) {
+    return apiClient.put(`/butacas/${butacaId}/estado`, { estado })
       .then(response => response.data)
       .catch(error => {
         console.error('Error updating seat:', error);

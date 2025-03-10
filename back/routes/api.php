@@ -33,7 +33,9 @@ Route::prefix('sessions')->group(function() {
     Route::get('{id}', [MovieSessionController::class, 'show']);
     Route::put('{id}', [MovieSessionController::class, 'update']);
     Route::delete('{id}', [MovieSessionController::class, 'destroy']);
-    Route::get('/sessions/movie/{movie_id}', [MovieSessionController::class, 'getSessionsByMovie']);
+    Route::get('/movie/{movie_id}', [MovieSessionController::class, 'getSessionsByMovie']);
+    Route::get('/movie/{movie_id}/date/{session_date}', [MovieSessionController::class, 'getSessionsByMovieAndDate']);
+
 });
 
 // Rutas para las compras de entradas
@@ -55,11 +57,10 @@ Route::prefix('entradas')->group(function() {
 
 // Rutas para las butacas
 Route::prefix('butacas')->group(function() {
-    // Ruta para obtener las butacas de una sesión con su estado (ocupada/reservada/libre)
     Route::get('{session_id}/{butaca_id}/estado', [ButacaController::class, 'verificarReserva']);
     
-    // Ruta para obtener las butacas de una sesión sin estado (solo la información básica)
-    
+    Route::get('sesion/{session_id}', [ButacaController::class, 'obtenerButacasPorSesion']);
+
     Route::get('{id}', [ButacaController::class, 'show']);
     Route::put('{id}', [ButacaController::class, 'update']);
     Route::delete('{id}', [ButacaController::class, 'destroy']);

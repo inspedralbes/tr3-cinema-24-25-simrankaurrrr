@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -7,6 +6,7 @@ use App\Http\Controllers\MovieController;
 use App\Http\Controllers\MovieSessionController;
 use App\Http\Controllers\CompraController;
 use App\Http\Controllers\ButacaController;
+use App\Http\Controllers\EntradaController;
 
 // Rutas para los usuarios
 Route::prefix('users')->group(function() {
@@ -33,6 +33,7 @@ Route::prefix('sessions')->group(function() {
     Route::get('{id}', [MovieSessionController::class, 'show']);
     Route::put('{id}', [MovieSessionController::class, 'update']);
     Route::delete('{id}', [MovieSessionController::class, 'destroy']);
+    Route::get('/sessions/movie/{movie_id}', [MovieSessionController::class, 'getSessionsByMovie']);
 });
 
 // Rutas para las compras de entradas
@@ -46,6 +47,7 @@ Route::prefix('compras')->group(function() {
     // Nueva ruta para que un usuario consulte sus entradas compradas
     Route::get('/usuario/{user_id}', [CompraController::class, 'getComprasPorUsuario']);
 });
+
 // Rutas para las entradas
 Route::prefix('entradas')->group(function() {
     Route::get('/', [EntradaController::class, 'index']); // Obtener todos los tipos de entradas
@@ -53,7 +55,11 @@ Route::prefix('entradas')->group(function() {
 
 // Rutas para las butacas
 Route::prefix('butacas')->group(function() {
-    Route::get('/session/{session_id}', [ButacaController::class, 'getButacasPorSesion']); // Obtener butacas de una sesión específica
+    // Ruta para obtener las butacas de una sesión con su estado (ocupada/reservada/libre)
+    Route::get('{session_id}/{butaca_id}/estado', [ButacaController::class, 'verificarReserva']);
+    
+    // Ruta para obtener las butacas de una sesión sin estado (solo la información básica)
+    
     Route::get('{id}', [ButacaController::class, 'show']);
     Route::put('{id}', [ButacaController::class, 'update']);
     Route::delete('{id}', [ButacaController::class, 'destroy']);

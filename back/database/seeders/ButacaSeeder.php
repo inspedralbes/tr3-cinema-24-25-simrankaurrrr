@@ -1,9 +1,9 @@
 <?php
+
 namespace Database\Seeders;
 
-use App\Models\Butaca;
-use App\Models\MovieSession;
 use Illuminate\Database\Seeder;
+use App\Models\Butaca;
 
 class ButacaSeeder extends Seeder
 {
@@ -14,28 +14,23 @@ class ButacaSeeder extends Seeder
      */
     public function run()
     {
-        $movieSession = MovieSession::first();  // Puedes cambiar por una sesión específica
+        // Filas de A a L
+        $filas = range('A', 'L'); 
 
-        $filas = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];  // Las filas A-L
+        // Columnas de 1 a 10
+        $columnas = range(1, 10); 
 
+        // Iterar sobre cada fila y columna
         foreach ($filas as $fila) {
-            $ocupadas = rand(3, 4);  // Seleccionamos aleatoriamente 3 o 4 butacas ocupadas en cada fila
-            
-            $butacas_ocupadas = array_rand(range(1, 10), $ocupadas); // Seleccionamos aleatoriamente las butacas ocupadas
-            
-            for ($columna = 1; $columna <= 10; $columna++) {
-                // Determinamos si la butaca es ocupada
-                $ocupada = in_array($columna, (array) $butacas_ocupadas) ? true : false;
-                
-                // Para la fila F, marcamos las butacas como VIP
-                $isVip = $fila === 'F' ? true : false;
+            foreach ($columnas as $columna) {
+                // Si la fila es la fila 6 (F), asignar VIP
+                $isVip = ($fila === 'F') ? true : false;
 
+                // Crear la butaca
                 Butaca::create([
-                    'movie_session_id' => $movieSession->id,
                     'fila' => $fila,
                     'columna' => $columna,
-                    'ocupada' => $ocupada,  // Asignamos si está ocupada
-                    'is_vip' => $isVip,  // Si es la fila F, marcarla como VIP
+                    'vip' => $isVip, // Asignamos el valor de VIP
                 ]);
             }
         }

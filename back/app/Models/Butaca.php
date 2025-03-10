@@ -14,10 +14,8 @@ class Butaca extends Model
 
     // Campos que pueden ser asignados masivamente
     protected $fillable = [
-        'movie_session_id',
         'fila',
         'columna',
-        'ocupada',
         'is_vip'
     ];
 
@@ -25,5 +23,9 @@ class Butaca extends Model
     public function movieSession()
     {
         return $this->belongsTo(MovieSession::class);
+    }
+    public function reservas()
+    {
+        return $this->hasMany(Reserva::class);
     }
 }

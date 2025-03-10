@@ -23,4 +23,8 @@ class User extends Model
     {
         return $this->hasMany(Compra::class);
     }
+    public function reservas()
+    {
+        return $this->hasMany(Reserva::class);
+    }
 }

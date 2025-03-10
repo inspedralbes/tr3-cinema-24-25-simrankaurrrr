@@ -6,6 +6,16 @@ use Illuminate\Http\Request;
 
 class MovieSessionController extends Controller
 {
+    public function getSessionsByMovie($movie_id) {
+        $sessions = MovieSession::where('movie_id', $movie_id)->get();
+    
+        if ($sessions->isEmpty()) {
+            return response()->json(['message' => 'No hay sesiones disponibles para esta película'], 404);
+        }
+    
+        return response()->json($sessions);
+    }
+    
     public function index()
     {
         $sessions = MovieSession::all();

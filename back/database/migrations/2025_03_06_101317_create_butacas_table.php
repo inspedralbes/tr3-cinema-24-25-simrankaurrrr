@@ -13,11 +13,9 @@ return new class extends Migration
     {
         Schema::create('butacas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('movie_session_id')->constrained()->onDelete('cascade');
             $table->string('fila');
             $table->integer('columna');
-            $table->boolean('ocupada')->default(false);
-            $table->boolean('is_vip')->default(false);
+            $table->boolean('vip')->default(false); // Agregamos el campo vip como booleano con valor por defecto 'false'
             $table->timestamps();
         });
     }

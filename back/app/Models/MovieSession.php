@@ -19,7 +19,10 @@ class MovieSession extends Model
         'session_date',
         'dia_espectador'
     ];
-
+    public function reservas()
+    {
+        return $this->hasMany(Reserva::class);
+    }
     // Relación con la tabla 'movies'
     public function movie()
     {

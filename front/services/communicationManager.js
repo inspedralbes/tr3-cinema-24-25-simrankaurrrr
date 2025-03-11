@@ -280,6 +280,46 @@ const communicationManager = {
         throw error;
       });
   },
+  getButacasPorSesion(sessionId) {
+    return apiClient.get(`/butacas/sesion/${sessionId}`)
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error fetching seats for session:', error);
+        throw error;
+      });
+  },
+
+  updateButaca(butacaId, estado) {
+    return apiClient.put(`/butacas/${butacaId}/estado`, { estado })
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error updating seat:', error);
+        throw error;
+      });
+  },
+
+  deleteButaca(butacaId) {
+    return apiClient.delete(`/butacas/${butacaId}`)
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error deleting seat:', error);
+        throw error;
+      });
+  },
+// Método para reservar una butaca
+reservarButaca(userId, movieSessionId, butacaId) {
+  return apiClient.post('/butacas/reservar-butaca', {
+    user_id: userId,
+    movie_session_id: movieSessionId,
+    butaca_id: butacaId
+  })
+  .then(response => response.data)
+  .catch(error => {
+    console.error('Error reservando la butaca:', error);
+    throw error;
+  });
+},
+  
 };
 
 export default communicationManager;

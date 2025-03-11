@@ -19,13 +19,18 @@ class Butaca extends Model
         'is_vip'
     ];
 
-    // Relación con la tabla 'movie_sessions'
     public function movieSession()
     {
         return $this->belongsTo(MovieSession::class);
     }
+    
     public function reservas()
     {
         return $this->hasMany(Reserva::class);
     }
+public function reserva()
+{
+    return $this->belongsTo(Reserva::class);
+}
+
 }

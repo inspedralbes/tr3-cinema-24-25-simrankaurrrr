@@ -23,9 +23,12 @@ class Reserva extends Model
     {
         return $this->belongsTo(MovieSession::class);
     }
+    
 
-    public function butaca()
-    {
-        return $this->belongsTo(Butaca::class);
-    }
+// app/Models/Reserva.php
+public function butaca()
+{
+    return $this->hasOne(Butaca::class);
+}
+
 }

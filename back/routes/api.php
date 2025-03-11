@@ -57,11 +57,23 @@ Route::prefix('entradas')->group(function() {
 
 // Rutas para las butacas
 Route::prefix('butacas')->group(function() {
-    Route::get('{session_id}/{butaca_id}/estado', [ButacaController::class, 'verificarReserva']);
     
     Route::get('sesion/{session_id}', [ButacaController::class, 'obtenerButacasPorSesion']);
 
     Route::get('{id}', [ButacaController::class, 'show']);
     Route::put('{id}', [ButacaController::class, 'update']);
     Route::delete('{id}', [ButacaController::class, 'destroy']);
+    // Verificar estado de la butaca
+    Route::get('{session_id}/{butaca_id}/estado', [ButacaController::class, 'verificarReserva']);
+    
+    // Obtener las butacas por sesión
+    Route::get('sesion/{session_id}', [ButacaController::class, 'obtenerButacasPorSesion']);
+
+    Route::delete('{session_id}/{butaca_id}/liberar', [ButacaController::class, 'liberarButaca']);
+
+    Route::post('/reservar-butaca', [ButacaController::class, 'reservarButaca']);
+    Route::put('{session_id}/{butaca_id}/confirmar', [ButacaController::class, 'confirmarButaca']);
+    Route::get('{session_id}/{butaca_id}/estado', [ButacaController::class, 'verificarReserva']);
+    
 });
+

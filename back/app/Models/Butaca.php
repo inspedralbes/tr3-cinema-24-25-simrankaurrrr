@@ -16,21 +16,22 @@ class Butaca extends Model
     protected $fillable = [
         'fila',
         'columna',
-        'is_vip'
+        'vip',
+        'precio' // Añadir el campo precio aquí
     ];
 
     public function movieSession()
     {
         return $this->belongsTo(MovieSession::class);
     }
-    
+
     public function reservas()
     {
         return $this->hasMany(Reserva::class);
     }
-public function reserva()
-{
-    return $this->belongsTo(Reserva::class);
-}
 
+    public function reserva()
+    {
+        return $this->belongsTo(Reserva::class);
+    }
 }

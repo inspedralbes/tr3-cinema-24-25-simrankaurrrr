@@ -43,7 +43,15 @@
           'bg-gray-500': butaca.estado === 'reservada' || butaca.estado === 'confirmada'
         }" class="w-full text-white p-2 rounded" :disabled="butaca.estado === 'confirmada' || butaca.estado === 'reservada'" @click="selectSeat(butaca)">
           {{ butaca.fila }}{{ butaca.columna }}
+          <span v-if="selectedSeats.includes(butaca.id)" class="text-yellow-300">
+            ({{ butaca.precio }}€)
+          </span>
         </button>
+      </div>
+
+      <!-- Mostrar el precio total -->
+      <div v-if="selectedSeats.length > 0" class="mt-6 text-center">
+        <p class="text-xl font-semibold text-gray-800">Precio Total: {{ totalPrice }}€</p>
       </div>
 
       <!-- Botón para confirmar selección -->
@@ -60,13 +68,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import communicationManager from '../../services/communicationManager';
 
 const route = useRoute();
 const movieId = route.params.id;
-
 const movie = ref(null);
 const sessions = ref([]);
 const seatsData = ref([]);
@@ -74,6 +81,7 @@ const availableDates = ref([]);
 const selectedSession = ref(null);
 const selectedDate = ref('');
 const selectedSeats = ref([]);
+const userId = 1; // ID del usuario logueado, puedes modificarlo según sea necesario
 
 // Obtener la película
 async function fetchMovie() {
@@ -112,64 +120,105 @@ async function fetchSessionsForDate(date) {
 function formatTime(sessionTime) {
   return new Date(`1970-01-01T${sessionTime}Z`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
-
 function selectSeat(butaca) {
-  if (butaca.estado === 'confirmada' || butaca.estado === 'reservada') return; // No permitir seleccionar asientos ya reservados
+  if (butaca.estado === 'confirmada' || butaca.estado === 'reservada') return;
 
-  const index = selectedSeats.value.findIndex(s => s.id === butaca.id);
+
+  const index = selectedSeats.value.findIndex(s => s.butaca_id === butaca.butaca_id); // Use butaca.butaca_id
   if (index === -1) {
-    selectedSeats.value.push(butaca); // Agregar butaca si no está seleccionada
+    selectedSeats.value.push({
+      butaca_id: butaca.butaca_id, // Use butaca.butaca_id
+      precio: butaca.precio,
+      fila: butaca.fila,
+      columna: butaca.columna,
+      estado: butaca.estado
+    });
   } else {
-    selectedSeats.value.splice(index, 1); // Quitar butaca si ya está seleccionada
+    selectedSeats.value.splice(index, 1);
   }
 }
+// Calcular el precio total
+const totalPrice = computed(() => {
+  let total = 0;
+  selectedSeats.value.forEach(butaca => {
+    total += butaca.precio; // El precio ya viene de la butaca seleccionada
+  });
 
+  return total.toFixed(2);
+});
 async function reservarAsientos() {
-  if (!selectedSession.value) {
-    console.error('No hay sesión seleccionada');
+  if (!selectedSession.value || selectedSeats.value.length === 0) {
+    alert('Por favor selecciona una sesión y asientos.');
     return;
   }
 
-  if (selectedSeats.value.length === 0) {
-    console.error('No hay asientos seleccionados');
-    alert('Selecciona al menos un asiento antes de reservar.');
+  // Filtrar las butacas disponibles antes de hacer la solicitud
+  const availableSeats = selectedSeats.value.filter(butaca => butaca.estado === 'disponible');
+  if (availableSeats.length === 0) {
+    alert('No hay butacas disponibles.');
     return;
   }
-
-  console.log("Asientos seleccionados para reserva:", selectedSeats.value);
 
   try {
-    for (const butaca of selectedSeats.value) {
-      // Verifica que butaca.butaca_id esté presente y sea válido
-      if (!butaca || !butaca.butaca_id) {
-        console.error("Error: Butaca inválida detectada", butaca);
-        continue;
+    // Mostrar los datos de las butacas seleccionadas para depuración
+    console.log('Butacas seleccionadas:', selectedSeats.value);
+
+    // Realizamos una solicitud individual por cada butaca seleccionada
+    for (let butaca of availableSeats) {
+      if (!butaca.butaca_id) {
+        console.error('Butaca sin ID:', butaca);
+        throw new Error('Butaca sin ID');
       }
 
-      // Usa butaca.butaca_id para realizar la reserva
-      await communicationManager.reservarButaca(1, selectedSession.value, butaca.butaca_id); // Suponiendo que user_id = 1
+      const reservationData = {
+        user_id: userId, // Usar la variable userId definida en el componente
+        movie_session_id: selectedSession.value,
+        butaca_id: butaca.butaca_id, // Asegurarse de que butaca.butaca_id esté definido
+      };
+
+      // Mostrar los datos que se están enviando en la consola para depuración
+      console.log('Datos de reserva que se están enviando:', reservationData);
+
+      // Enviar la solicitud para reservar cada butaca
+      const response = await communicationManager.reservarButaca(
+        reservationData.user_id,
+        reservationData.movie_session_id,
+        reservationData.butaca_id
+      );
+
+      // Mostrar la respuesta completa en la consola para depuración
+      console.log('Respuesta del servidor:', response);
+
+      // Verifica si la respuesta contiene datos de reserva y butaca
+      if (response.reserva) {
+        const reserva = response.reserva;
+        const precioReserva = reserva.precio || butaca.precio; // Si no hay precio en la respuesta, usa el precio de la butaca
+        alert(`Reserva realizada con éxito para la butaca ${butaca.fila}${butaca.columna}. Precio: ${precioReserva}€`);
+
+        // Actualizar el estado de la butaca a 'reservada'
+        const reservedSeat = seatsData.value.find(seat => seat.id === butaca.butaca_id);
+        if (reservedSeat) {
+          reservedSeat.estado = 'reservada'; // Actualizamos el estado de la butaca
+        }
+      } else {
+        console.error('Respuesta inesperada del servidor:', response);
+        throw new Error(`Error en la reserva para la butaca ${butaca.fila}${butaca.columna}`);
+      }
     }
 
-    alert('Reserva exitosa');
-    fetchSeats(); // Recargar las butacas
-    selectedSeats.value = []; // Limpiar selección
-
+    fetchSeats(); // Recargar las butacas disponibles
+    selectedSeats.value = []; // Limpiar selección de asientos
   } catch (error) {
-    console.error('Error reservando butacas:', error);
-    alert('Hubo un error al reservar las butacas.');
+    // Mostrar información completa del error en la consola
+    console.error('Error reservando la butaca:', error);
+    alert('Hubo un error al realizar la reserva. Revisa la consola para más detalles.');
   }
 }
 
 
-// Obtener las butacas de la sesión seleccionada
 async function fetchSeats() {
-  try {
-    if (selectedSession.value) {
-      seatsData.value = await communicationManager.getButacasPorSesion(selectedSession.value);
-      selectedSeats.value = []; // Limpiar selección anterior
-    }
-  } catch (error) {
-    console.error('Error fetching seats:', error);
+  if (selectedSession.value) {
+    seatsData.value = await communicationManager.getButacasPorSesion(selectedSession.value);
   }
 }
 

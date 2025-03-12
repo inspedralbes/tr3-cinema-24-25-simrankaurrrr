@@ -33,9 +33,5 @@ class Compra extends Model
         return $this->belongsTo(MovieSession::class);
     }
 
-    // Relación con el modelo 'Entrada' (tipo de entrada)
-    public function entrada()
-    {
-        return $this->belongsTo(Entrada::class, 'entry_type_id');
-    }
+   
 }

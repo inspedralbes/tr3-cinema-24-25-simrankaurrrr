@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('movie_session_id')->constrained('movie_sessions')->onDelete('cascade'); // Sesión de cine
             $table->foreignId('butaca_id')->constrained('butacas')->onDelete('cascade'); // Butaca reservada
             $table->string('estado')->default('reservada'); // Columna de estado, con valor por defecto 'reservada'
+            $table->decimal('precio', 8, 2); // Columna para el precio de la reserva
             $table->timestamps();
         });
     }

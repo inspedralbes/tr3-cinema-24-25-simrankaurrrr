@@ -3,38 +3,130 @@ namespace App\Http\Controllers;
 
 use App\Models\Butaca;
 use App\Models\Reserva;
+use App\Models\MovieSession;
+
 use Illuminate\Http\Request;
 
 class ButacaController extends Controller
 {
+ 
+    public function obtenerButacasPorSesion($session_id, Request $request)
+    {
+        $reservas = Reserva::where('movie_session_id', $session_id)->get();
+        $resultado = [];
 
-    public function reservarButaca(Request $request)
-{
-    $request->validate([
-        'user_id' => 'required|exists:users,id',
-        'movie_session_id' => 'required|exists:movie_sessions,id',
-        'butaca_id' => 'required|exists:butacas,id',
-    ]);
+        // Obtener la sesión para verificar si es "Día del Espectador"
+        $sesion = MovieSession::find($session_id);
+        $esDiaEspectador = $sesion->dia_espectador; // Obtenemos el valor de dia_espectador
 
-    // Verificar si la butaca ya está reservada o confirmada
-    $reservaExistente = Reserva::where('movie_session_id', $request->movie_session_id)
-        ->where('butaca_id', $request->butaca_id)
-        ->first();
+        // Determinar el ajuste del precio
+        $descuento = $esDiaEspectador == 1 ? 2 : 0; // Si es día de espectador, descuento de 2 euros
 
-    if ($reservaExistente) {
-        return response()->json(['message' => 'La butaca ya está reservada o confirmada'], 400);
+        foreach ($reservas as $reserva) {
+            $butaca = Butaca::find($reserva->butaca_id);
+
+            if ($butaca) {
+                $estado = $reserva->estado;
+                $user_id = $reserva->user_id;
+
+                // Obtener el precio de la butaca y aplicar el descuento si corresponde
+                $precioOriginal = $butaca->precio;
+                $precioConDescuento = $precioOriginal - $descuento; // Descontamos 2 euros si es "Día del Espectador"
+
+                $resultado[] = [
+                    'butaca_id' => $butaca->id,
+                    'fila' => $butaca->fila,
+                    'columna' => $butaca->columna,
+                    'estado' => $estado,
+                    'user_id' => $user_id,
+                    'vip' => $butaca->vip,
+                    'precio' => $precioConDescuento, // Mostramos el precio con el descuento
+                ];
+            }
+        }
+
+        // Añadir las butacas disponibles
+        $butacasDisponibles = Butaca::whereNotIn('id', array_column($resultado, 'butaca_id'))->get();
+
+        foreach ($butacasDisponibles as $butaca) {
+            $estado = 'disponible';
+            $user_id = null;
+
+            if ($request->user() && $this->isUserSelecting($butaca->id, $request->user()->id)) {
+                $estado = 'seleccionada';
+            }
+
+            // Obtener el precio de la butaca y aplicar el descuento si corresponde
+            $precioOriginal = $butaca->precio;
+            $precioConDescuento = $precioOriginal - $descuento; // Descontamos 2 euros si es "Día del Espectador"
+
+            $resultado[] = [
+                'butaca_id' => $butaca->id,
+                'fila' => $butaca->fila,
+                'columna' => $butaca->columna,
+                'estado' => $estado,
+                'user_id' => $user_id,
+                'vip' => $butaca->vip,
+                'precio' => $precioConDescuento, // Mostramos el precio con el descuento
+            ];
+        }
+
+        return response()->json($resultado);
     }
 
-    // Crear la nueva reserva con estado "reservada"
-    $reserva = Reserva::create([
-        'user_id' => $request->user_id,
-        'movie_session_id' => $request->movie_session_id,
-        'butaca_id' => $request->butaca_id,
-        'estado' => 'reservada',
-    ]);
-
-    return response()->json($reserva, 201);
-}
+    public function reservarButaca(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'movie_session_id' => 'required|exists:movie_sessions,id',
+            'butaca_id' => 'required|exists:butacas,id', // Se asegura de que la butaca exista
+        ]);
+        
+        // Verificar si la butaca ya está reservada o confirmada
+        $reservaExistente = Reserva::where('movie_session_id', $request->movie_session_id)
+            ->where('butaca_id', $request->butaca_id)
+            ->first();
+    
+        if ($reservaExistente) {
+            return response()->json(['message' => 'La butaca ya está reservada o confirmada'], 400);
+        }
+    
+        // Obtener la butaca seleccionada
+        $butaca = Butaca::find($request->butaca_id);
+        if (!$butaca) {
+            return response()->json(['message' => 'Butaca no encontrada'], 404); // Añadimos validación para asegurarnos de que la butaca existe
+        }
+    
+        // Obtener el precio original de la butaca
+        $precioOriginal = $butaca->precio;
+    
+        // Obtener la sesión para verificar si es "Día del Espectador"
+        $sesion = MovieSession::find($request->movie_session_id);
+        $esDiaEspectador = $sesion->dia_espectador;
+    
+        // Determinar el descuento basado en el "Día del Espectador"
+        $descuento = $esDiaEspectador == 1 ? 2 : 0;
+    
+        // Calcular el precio ajustado
+        $precioFinal = $precioOriginal - $descuento;
+    
+        // Crear la nueva reserva con estado "reservada" y guardar el precio ajustado
+        $reserva = Reserva::create([
+            'user_id' => $request->user_id,
+            'movie_session_id' => $request->movie_session_id,
+            'butaca_id' => $request->butaca_id,
+            'estado' => 'reservada',
+            'precio' => $precioFinal, // Guardamos el precio ajustado
+        ]);
+    
+        // Devolver la información de la reserva junto con el precio ajustado
+        return response()->json([
+            'reserva' => $reserva,
+            'precio' => $precioFinal, // Precio ajustado
+            'butaca' => $butaca,
+        ], 201);
+    }
+    
 
     public function confirmarButaca($session_id, $butaca_id)
     {
@@ -86,87 +178,35 @@ class ButacaController extends Controller
     }
     
     public function liberarButaca($session_id, $butaca_id)
-{
-    // Buscar la reserva de la butaca en la sesión dada
-    $reserva = Reserva::where('movie_session_id', $session_id)
-        ->where('butaca_id', $butaca_id)
-        ->first();
-
-    // Si no existe la reserva, devolver error
-    if (!$reserva) {
-        return response()->json(['message' => 'No se encontró una reserva para esta butaca'], 404);
-    }
-
-    // Eliminar la reserva para liberar la butaca
-    $reserva->delete();
-
-    return response()->json(['message' => 'Butaca liberada con éxito'], 200);
-}
-
-
-    // Método para obtener el estado de las butacas por sesión
-    public function obtenerButacasPorSesion($session_id, Request $request)
     {
-        // Obtener todas las reservas para la sesión indicada
-        $reservas = Reserva::where('movie_session_id', $session_id)->get();
+        // Buscar la reserva de la butaca en la sesión dada
+        $reserva = Reserva::where('movie_session_id', $session_id)
+            ->where('butaca_id', $butaca_id)
+            ->first();
 
-        // Arreglo para almacenar las butacas con su estado
-        $resultado = [];
-
-        // Obtener las butacas asociadas con las reservas
-        foreach ($reservas as $reserva) {
-            // Obtener la butaca asociada a la reserva
-            $butaca = Butaca::find($reserva->butaca_id);
-
-            // Si la butaca existe, se marca como ocupada
-            if ($butaca) {
-                $estado = $reserva->estado; // Usar el estado de la reserva, como 'reservada', 'confirmada', etc.
-                $user_id = $reserva->user_id; // Obtener el ID del usuario que hizo la reserva
-            } else {
-                // Si no existe la butaca, se omite
-                continue;
-            }
-
-            // Añadir la butaca al arreglo de resultados con su estado y user_id si está ocupada
-            $resultado[] = [
-                'butaca_id' => $butaca->id,
-                'fila' => $butaca->fila,
-                'columna' => $butaca->columna,
-                'estado' => $estado,
-                'user_id' => $user_id,
-            ];
+        // Si no existe la reserva, devolver error
+        if (!$reserva) {
+            return response()->json(['message' => 'No se encontró una reserva para esta butaca'], 404);
         }
 
-        // Asegurarse de que todas las butacas, incluso si no están reservadas, se muestren
-        $butacasDisponibles = Butaca::whereNotIn('id', array_column($resultado, 'butaca_id'))->get();
-        
-        foreach ($butacasDisponibles as $butaca) {
-            $estado = 'disponible'; // Gris para disponibles
-            $user_id = null;
+        // Eliminar la reserva para liberar la butaca
+        $reserva->delete();
 
-            // Verificar si la butaca está seleccionada por el usuario
-            if ($request->user() && $this->isUserSelecting($butaca->id, $request->user()->id)) {
-                $estado = 'seleccionada'; // Verde para seleccionada por el usuario
-            }
-
-            // Añadir la butaca con el estado apropiado
-            $resultado[] = [
-                'butaca_id' => $butaca->id,
-                'fila' => $butaca->fila,
-                'columna' => $butaca->columna,
-                'estado' => $estado,
-                'user_id' => $user_id,
-            ];
-        }
-
-        // Retornar el resultado en formato JSON
-        return response()->json($resultado);
+        return response()->json(['message' => 'Butaca liberada con éxito'], 200);
     }
+
+    
+    // Función auxiliar para determinar si es "Día del Espectador"
+    private function esDiaEspectador($fecha)
+    {
+        $diasEspectador = ['Wednesday']; // Puedes modificarlo según las reglas de negocio
+        return in_array(date('l', strtotime($fecha)), $diasEspectador);
+    }
+    
 
     // Método para verificar si el usuario está seleccionando una butaca
     private function isUserSelecting($butaca_id, $user_id)
     {
-       
         return false;
     }
 
@@ -195,15 +235,19 @@ class ButacaController extends Controller
         }
     }
 
-    // Método para obtener una butaca por su ID
     public function show($id)
     {
         $butaca = Butaca::find($id);
         if (!$butaca) {
             return response()->json(['message' => 'Butaca no encontrada'], 404);
         }
-        return response()->json($butaca);
+    
+        return response()->json([
+            'butaca' => $butaca,
+            'precio' => $butaca->precio, // Mostramos el precio de la butaca
+        ]);
     }
+    
 
     // Método para crear una nueva butaca
     public function store(Request $request)
@@ -255,6 +299,4 @@ class ButacaController extends Controller
         $butaca->delete();
         return response()->json(['message' => 'Butaca eliminada correctamente']);
     }
-
-  
 }

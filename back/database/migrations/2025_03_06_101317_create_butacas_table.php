@@ -12,12 +12,14 @@ return new class extends Migration
     public function up()
     {
         Schema::create('butacas', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // Debería ser un bigIncrements
             $table->string('fila');
             $table->integer('columna');
-            $table->boolean('vip')->default(false); // Agregamos el campo vip como booleano con valor por defecto 'false'
+            $table->boolean('vip')->default(false);
+            $table->decimal('precio', 8, 2)->default(6.00);
             $table->timestamps();
         });
+        
     }
 
     /**

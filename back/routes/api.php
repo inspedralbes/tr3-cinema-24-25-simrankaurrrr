@@ -7,6 +7,7 @@ use App\Http\Controllers\MovieSessionController;
 use App\Http\Controllers\CompraController;
 use App\Http\Controllers\ButacaController;
 use App\Http\Controllers\EntradaController;
+use App\Http\Controllers\ReservaController;
 
 // Rutas para los usuarios
 Route::prefix('users')->group(function() {
@@ -74,6 +75,7 @@ Route::prefix('butacas')->group(function() {
     Route::post('/reservar-butaca', [ButacaController::class, 'reservarButaca']);
     Route::put('{session_id}/{butaca_id}/confirmar', [ButacaController::class, 'confirmarButaca']);
     Route::get('{session_id}/{butaca_id}/estado', [ButacaController::class, 'verificarReserva']);
-    
-});
+    // Obtener todas las reservas para una sesión de cine
 
+
+});

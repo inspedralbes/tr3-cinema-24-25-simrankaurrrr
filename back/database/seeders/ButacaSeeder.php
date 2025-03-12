@@ -23,14 +23,16 @@ class ButacaSeeder extends Seeder
         // Iterar sobre cada fila y columna
         foreach ($filas as $fila) {
             foreach ($columnas as $columna) {
-                // Si la fila es la fila 6 (F), asignar VIP
+                // Si la fila es la fila 6 (F), asignar VIP y precio 8
                 $isVip = ($fila === 'F') ? true : false;
+                $precio = ($fila === 'F') ? 8.00 : 6.00; // Precio 8 para la fila 'F', 6 para las demás
 
                 // Crear la butaca
                 Butaca::create([
                     'fila' => $fila,
                     'columna' => $columna,
                     'vip' => $isVip, // Asignamos el valor de VIP
+                    'precio' => $precio, // Asignamos el precio según la fila
                 ]);
             }
         }

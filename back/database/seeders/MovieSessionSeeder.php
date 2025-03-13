@@ -14,7 +14,8 @@ class MovieSessionSeeder extends Seeder
      */
     public function run()
     {
-        $movie = Movie::first();  // Cambia esto para especificar una película si lo deseas
+        $movie = Movie::first();  // Obtiene la primera película
+        $movie2 = Movie::skip(1)->first();  // Obtiene la segunda película (salta el primer registro)
 
         MovieSession::create([
             'movie_id' => $movie->id,
@@ -22,10 +23,15 @@ class MovieSessionSeeder extends Seeder
             'session_date' => '2025-03-10',
             'dia_espectador' => false,
         ]);
-
         MovieSession::create([
             'movie_id' => $movie->id,
             'session_time' => '18:00:00',
+            'session_date' => '2025-03-10',
+            'dia_espectador' => true,  // Es un Día del espectador
+        ]);
+        MovieSession::create([
+            'movie_id' => $movie2->id,
+            'session_time' => '21:00:00',
             'session_date' => '2025-03-10',
             'dia_espectador' => true,  // Es un Día del espectador
         ]);

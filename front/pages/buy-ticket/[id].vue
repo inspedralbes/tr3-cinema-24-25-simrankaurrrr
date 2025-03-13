@@ -137,6 +137,7 @@ function selectSeat(butaca) {
     selectedSeats.value.splice(index, 1);
   }
 }
+
 // Calcular el precio total
 const totalPrice = computed(() => {
   let total = 0;

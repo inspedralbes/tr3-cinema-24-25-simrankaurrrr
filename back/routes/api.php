@@ -6,7 +6,6 @@ use App\Http\Controllers\MovieController;
 use App\Http\Controllers\MovieSessionController;
 use App\Http\Controllers\CompraController;
 use App\Http\Controllers\ButacaController;
-use App\Http\Controllers\EntradaController;
 use App\Http\Controllers\ReservaController;
 
 // Rutas para los usuarios
@@ -51,10 +50,6 @@ Route::prefix('compras')->group(function() {
     Route::get('/usuario/{user_id}', [CompraController::class, 'getComprasPorUsuario']);
 });
 
-// Rutas para las entradas
-Route::prefix('entradas')->group(function() {
-    Route::get('/', [EntradaController::class, 'index']); // Obtener todos los tipos de entradas
-});
 
 // Rutas para las butacas
 Route::prefix('butacas')->group(function() {

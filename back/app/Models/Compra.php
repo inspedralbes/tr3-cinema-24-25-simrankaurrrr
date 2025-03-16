@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,38 +13,32 @@ class Compra extends Model
     protected $fillable = [
         'user_id',
         'movie_session_id',
-        'butaca_id',  // Añadido el campo butaca_id
+        'butaca_ids',
         'ticket_quantity',
         'total_amount',
-        'estado'  // Agregar el campo 'estado' para poder actualizarlo
+        'estado'
     ];
 
-    // Relación con User
+    // Indicamos que el campo butaca_ids es de tipo JSON y debe ser tratado como un array
+    protected $casts = [
+        'butaca_ids' => 'array',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // Relación con MovieSession
     public function movieSession()
     {
         return $this->belongsTo(MovieSession::class);
     }
 
-// Relación con Butacas (si hay múltiples butacas en una compra)
-public function butacas()
-{
-    return $this->hasMany(Butaca::class);
-}
-
-
-    // Relación con Pagos
     public function pagos()
     {
         return $this->hasMany(Pagos::class, 'compra_id');
     }
 
-    // Relación con Reserva
     public function reserva()
     {
         return $this->hasOne(Reserva::class, 'compra_id');

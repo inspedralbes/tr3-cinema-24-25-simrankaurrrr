@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\DB;
 
 use App\Models\Butaca;
 use App\Models\Reserva;
@@ -15,174 +16,157 @@ class ButacaController extends Controller
 {
     public function obtenerButacasPorSesion($session_id, Request $request)
     {
-        $reservas = Reserva::where('movie_session_id', $session_id)->get();
+        // Obtener todas las butacas de la sesión
+        $butacas = Butaca::all();
+    
+        // Obtener las compras pagadas
+        $comprasPagadas = Compra::where('movie_session_id', $session_id)
+            ->where('estado', 'pagado')
+            ->pluck('butaca_ids')->toArray();
+    
+        // Obtener las reservas en proceso (esto indica que aún no han sido pagadas)
+        $reservasEnProceso = Reserva::where('movie_session_id', $session_id)
+            ->where('estado', 'en_proceso')
+            ->pluck('butaca_ids')->toArray();
+    
+        // Convertir JSON a arrays
+        $comprasPagadas = collect($comprasPagadas)->map(fn($c) => json_decode($c, true))->flatten()->toArray();
+        $reservasEnProceso = collect($reservasEnProceso)->map(fn($r) => json_decode($r, true))->flatten()->toArray();
+    
         $resultado = [];
     
-        // Obtener la sesión para verificar si es "Día del Espectador"
-        $sesion = MovieSession::find($session_id);
-        $esDiaEspectador = $sesion->dia_espectador; // Obtenemos el valor de dia_espectador
-    
-        // Determinar el ajuste del precio
-        $descuento = $esDiaEspectador == 1 ? 2 : 0; // Si es día de espectador, descuento de 2 euros
-    
-        foreach ($reservas as $reserva) {
-            $butaca = Butaca::find($reserva->butaca_id);
-    
-            if ($butaca) {
-                $estado = $reserva->estado;
-    
-                // Obtener el precio de la butaca y aplicar el descuento si corresponde
-                $precioOriginal = $butaca->precio;
-                $precioConDescuento = $precioOriginal - $descuento; // Descontamos 2 euros si es "Día del Espectador"
-    
-                $resultado[] = [
-                    'butaca_id' => $butaca->id,
-                    'fila' => $butaca->fila,
-                    'columna' => $butaca->columna,
-                    'estado' => $estado,
-                    'vip' => $butaca->vip,
-                    'precio' => $precioConDescuento, // Mostramos el precio con el descuento
-                ];
-            }
-        }
-    
-        // Añadir las butacas disponibles
-        $butacasDisponibles = Butaca::whereNotIn('id', array_column($resultado, 'butaca_id'))->get();
-    
-        foreach ($butacasDisponibles as $butaca) {
+        foreach ($butacas as $butaca) {
             $estado = 'disponible';
-            $user_id = null;
     
-            if ($request->user() && $this->isUserSelecting($butaca->id, $request->user()->id)) {
-                $estado = 'seleccionada';
+            if (in_array($butaca->id, $comprasPagadas)) {
+                $estado = 'comprado';
+            } elseif (in_array($butaca->id, $reservasEnProceso)) {
+                $estado = 'reservado';
             }
-    
-            // Obtener el precio de la butaca y aplicar el descuento si corresponde
-            $precioOriginal = $butaca->precio;
-            $precioConDescuento = $precioOriginal - $descuento; // Descontamos 2 euros si es "Día del Espectador"
     
             $resultado[] = [
                 'butaca_id' => $butaca->id,
                 'fila' => $butaca->fila,
                 'columna' => $butaca->columna,
                 'estado' => $estado,
-                'user_id' => $user_id,
                 'vip' => $butaca->vip,
-                'precio' => $precioConDescuento, // Mostramos el precio con el descuento
+                'precio' => $butaca->precio,
             ];
         }
     
         return response()->json($resultado);
     }
-
+    
     public function reservarButaca(Request $request)
+{
+    $user = auth()->user();
+    
+    // Validación de la solicitud
+    $request->validate([
+        'movie_session_id' => 'required|exists:movie_sessions,id',
+        'butaca_ids' => 'required|array',
+        'butaca_ids.*' => 'exists:butacas,id',
+    ]);
+
+    // Verificar cuántas entradas ha comprado el usuario para esta sesión
+    $comprasExistentes = Compra::where('user_id', $user->id)
+        ->where('movie_session_id', $request->movie_session_id)
+        ->get();
+    
+    $entradasCompradas = $comprasExistentes->sum('ticket_quantity');
+
+    // Verificar si el usuario ya tiene 10 entradas para esta sesión
+    if ($entradasCompradas + count($request->butaca_ids) > 10) {
+        return response()->json(['message' => 'No puedes comprar más de 10 entradas para esta sesión'], 400);
+    }
+
+    // Crear las compras y reservas
+    foreach ($request->butaca_ids as $butaca_id) {
+        $butaca = Butaca::find($butaca_id);
+        if (!$butaca) {
+            return response()->json(['message' => 'Butaca no encontrada.'], 404);
+        }
+
+        // Crear la compra
+        $compra = new Compra();
+        $compra->user_id = $user->id;
+        $compra->movie_session_id = $request->movie_session_id;
+        $compra->ticket_quantity = 1;
+        $compra->total_amount = $butaca->precio; // Precio dinámico
+        $compra->estado = 'en_proceso';
+        $compra->butaca_ids = json_encode([$butaca_id]);
+        $compra->save();
+
+        // Crear la reserva
+        $reserva = new Reserva();
+        $reserva->compra_id = $compra->id;
+        $reserva->user_id = $user->id;
+        $reserva->movie_session_id = $request->movie_session_id;
+        $reserva->butaca_ids = json_encode([$butaca_id]);
+        $reserva->estado = 'en_proceso'; // Cambiado de 'procesando' a 'en_proceso' para coherencia
+        $reserva->precio = $butaca->precio;
+        $reserva->save();
+    }
+
+    return response()->json([
+        'message' => 'Reservas en proceso. Por favor, complete el pago.',
+    ], 200);
+}
+
+
+public function confirmarCompra(Request $request)
 {
     $user = auth()->user();
 
     // Validación de la solicitud
     $request->validate([
-        'movie_session_id' => 'required|exists:movie_sessions,id',
-        'butaca_id' => 'required|exists:butacas,id',
+        'reserva_ids' => 'required|array',
+        'reserva_ids.*' => 'exists:reservas,id',
+        'numero_tarjeta' => 'required|string',
+        'fecha_vencimiento' => 'required|string',
+        'cvv' => 'required|string',
     ]);
 
-    // Verificar si ya existe una compra en proceso para este usuario
-    $compra = Compra::where('user_id', $user->id)
-        ->where('movie_session_id', $request->movie_session_id)
-        ->where('estado', 'en_proceso')
-        ->first();
+    // Simulación de validación de pago
+    $pagoExitoso = $this->validarPagoSimulado($request->numero_tarjeta, $request->cvv, $request->fecha_vencimiento);
 
-    // Si no existe una compra en proceso, crear una nueva compra
-    if (!$compra) {
-        $compra = new Compra();
-        $compra->user_id = $user->id;
-        $compra->butaca_id = $request->butaca_id;
-        $compra->movie_session_id = $request->movie_session_id;
-        $compra->ticket_quantity = 1;
-        $compra->total_amount = 6; // Precio predeterminado
-        $compra->estado = 'en_proceso';
-        $compra->save();
+    // Registrar el pago
+    $pago = new Pagos();
+    $pago->numero_tarjeta = $request->numero_tarjeta;
+    $pago->fecha_vencimiento = $request->fecha_vencimiento;
+    $pago->cvv = $request->cvv;
+    $pago->estado_pago = $pagoExitoso ? 'completado' : 'fallido';
+    $pago->save();
+
+    if ($pagoExitoso) {
+        DB::beginTransaction();
+        try {
+            foreach ($request->reserva_ids as $reserva_id) {
+                $reserva = Reserva::find($reserva_id);
+                if ($reserva && $reserva->estado === 'en_proceso') {
+                    // Actualizar la compra a "pagado"
+                    $compra = Compra::find($reserva->compra_id);
+                    if ($compra) {
+                        $compra->estado = 'pagado';
+                        $compra->save();
+                    }
+
+                    // Eliminar la reserva porque ya fue pagada
+                    $reserva->estado = 'pagada'; // Para mantener el registro en la base de datos
+                    $reserva->save();
+                }
+            }
+
+            DB::commit();
+            return response()->json(['message' => 'Compra confirmada y reserva eliminada.'], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error en la confirmación de la compra.'], 500);
+        }
     }
 
-    // Verificar si la butaca ya está reservada
-    $reservaExistente = Reserva::where('movie_session_id', $request->movie_session_id)
-        ->where('butaca_id', $request->butaca_id)
-        ->first();
-
-    if ($reservaExistente) {
-        return response()->json(['message' => 'La butaca ya está reservada'], 400);
-    }
-
-    // Crear una nueva reserva con estado 'procesando' y asociarla con la compra
-// Crear una nueva reserva con estado 'procesando' y asociarla con la compra
-$reserva = new Reserva();
-$reserva->compra_id = $compra->id;  // Asociamos la compra con la reserva
-$reserva->user_id = $user->id;
-$reserva->movie_session_id = $request->movie_session_id;
-$reserva->butaca_id = $request->butaca_id;
-$reserva->estado = 'procesando';
-$reserva->precio = 6;  // Precio predeterminado
-$reserva->save();
-
-    return response()->json([
-        'message' => 'Reserva en proceso. Por favor, complete el pago.',
-        'reserva' => $reserva, // Datos de la reserva
-        'compra_id' => $compra->id // Asegúrate de devolver el compra_id
-    ], 200);
+    return response()->json(['message' => 'Pago fallido.'], 400);
 }
-
-
-    // Actualizado: Confirmar directamente la compra cuando se ingresen los datos de pago
-    public function confirmarCompra(Request $request)
-    {
-        $user = auth()->user(); // Obtener el usuario autenticado
-    
-        // Validación de la solicitud
-        $request->validate([
-            'reserva_id' => 'required|exists:reservas,id',  // Aseguramos que la reserva existe
-            'numero_tarjeta' => 'required|string',
-            'fecha_vencimiento' => 'required|string',
-            'cvv' => 'required|string',
-        ]);
-
-        // Obtener la reserva por su ID
-        $reserva = Reserva::find($request->reserva_id);
-
-        // Si la reserva no existe o no está en proceso, devolver error
-        if (!$reserva || $reserva->estado !== 'procesando') {
-            return response()->json(['message' => 'La reserva no está disponible para compra'], 400);
-        }
-
-        // Simulación de validación de pago
-        $pagoExitoso = $this->validarPagoSimulado($request->numero_tarjeta, $request->cvv, $request->fecha_vencimiento);
-
-        // Crear un registro en la tabla 'pagos'
-        $pago = new Pagos();
-        $pago->reserva_id = $reserva->id;
-        $pago->numero_tarjeta = $request->numero_tarjeta;
-        $pago->fecha_vencimiento = $request->fecha_vencimiento;
-        $pago->cvv = $request->cvv;
-        $estadoPago = $pagoExitoso ? 'completado' : 'fallido';
-        $pago->estado_pago = $estadoPago;
-        $pago->save();
-
-        // Actualizar el estado de la reserva según el pago
-        if ($pagoExitoso) {
-            // Si el pago es exitoso, marcar la reserva como "confirmado" y "pagado"
-            $reserva->estado = 'confirmado'; // Cambio el estado a "confirmado"
-            $reserva->estado_compra = 'pagado'; // Estado de compra "pagado"
-            $reserva->save();
-
-            return response()->json(['message' => 'Pago exitoso, compra confirmada!'], 200);
-        } else {
-            // Si el pago falla, marcar la reserva como "reservada" y estado de compra "fallido"
-            $reserva->estado = 'reservada'; 
-            $reserva->estado_compra = 'fallido';
-            $reserva->save();
-
-            return response()->json(['message' => 'Pago fallido, reserva no confirmada.'], 400);
-        }
-    }
-
     // Función para simular la validación del pago
     private function validarPagoSimulado($numeroTarjeta, $cvv, $fechaVencimiento)
     {
@@ -239,36 +223,101 @@ $reserva->save();
         }
     }
     public function verCarrito(Request $request)
-{
-    $user = auth()->user();
-
-    // Obtener todas las reservas en estado "procesando" del usuario
-    $reservas = Reserva::where('user_id', $user->id)
-                        ->where('estado', 'procesando')
-                        ->get();
-
-    $carrito = [];
-
-    foreach ($reservas as $reserva) {
-        $butaca = Butaca::find($reserva->butaca_id);
-        $compra = Compra::where('id', $reserva->compra_id)->first(); // Obtener la compra asociada
-
-        if ($butaca && $compra) {
-            $carrito[] = [
-                'compra_id' => $compra->id, // Ahora se obtiene correctamente la compra_id
-                'reserva_id' => $reserva->id,
-                'butaca_id' => $butaca->id,
-                'fila' => $butaca->fila,
-                'columna' => $butaca->columna,
-                'precio' => $reserva->precio,
-                'session_id' => $reserva->movie_session_id,
-                'estado' => $reserva->estado,
-                'nombre_pelicula' => $reserva->movieSession->movie->title,
-            ];
+    {
+        $user = auth()->user();
+    
+        // Verificar si el usuario está autenticado
+        if (!$user) {
+            return response()->json(['message' => 'Usuario no autenticado'], 401);
         }
+    
+        // Obtener todas las reservas en estado "en_proceso" o "procesando" del usuario
+        $reservas = Reserva::where('user_id', $user->id)
+                            ->whereIn('estado', ['en_proceso', 'procesando']) // Incluir ambos estados
+                            ->with(['butaca', 'movieSession.movie']) // Cargar relaciones
+                            ->get();
+    
+        $carrito = [];
+    
+        foreach ($reservas as $reserva) {
+            // Decodificar butaca_ids (que está en formato JSON)
+            $butacaIds = json_decode($reserva->butaca_ids, true);
+    
+            // Obtener las butacas asociadas
+            $butacas = Butaca::whereIn('id', $butacaIds)->get();
+    
+            foreach ($butacas as $butaca) {
+                $carrito[] = [
+                    'compra_id' => $reserva->compra_id,
+                    'reserva_id' => $reserva->id,
+                    'butaca_id' => $butaca->id,
+                    'fila' => $butaca->fila,
+                    'columna' => $butaca->columna,
+                    'precio' => $reserva->precio,
+                    'session_id' => $reserva->movie_session_id,
+                    'estado' => $reserva->estado,
+                    'nombre_pelicula' => $reserva->movieSession->movie->title,
+                ];
+            }
+        }
+    
+        return response()->json($carrito);
     }
 
-    return response()->json($carrito);
+public function eliminarReserva($reserva_id)
+{
+    $reserva = Reserva::find($reserva_id);
+
+    if ($reserva) {
+        $reserva->delete();
+        return response()->json(['message' => 'Reserva eliminada con éxito']);
+    } else {
+        return response()->json(['message' => 'Reserva no encontrada'], 404);
+    }
+}
+
+public function verEstadoSesion($session_id)
+{
+    // Obtener todas las butacas asociadas a la sesión
+    $butacas = Butaca::all();
+
+    // Obtener reservas y compras para la sesión
+    $reservas = Reserva::where('movie_session_id', $session_id)->get();
+    $compras = Compra::where('movie_session_id', $session_id)->get();
+
+    $resultado = [];
+
+    foreach ($butacas as $butaca) {
+        // Estado por defecto
+        $estado = 'disponible';
+
+        // Buscar si la butaca está en una reserva "en_proceso"
+        $reserva = $reservas->firstWhere('butaca_ids', 'like', '%"'.$butaca->id.'"%');
+        if ($reserva && $reserva->estado === 'en_proceso') {
+            $estado = 'reservado';  // Butaca reservada pero no pagada
+        }
+
+        // Buscar si la butaca ya fue comprada y pagada
+        foreach ($compras as $compra) {
+            $butaca_ids = json_decode($compra->butaca_ids, true);
+            if (in_array($butaca->id, $butaca_ids) && $compra->estado === 'pagado') {
+                $estado = 'comprado';  // Butaca ya comprada y pagada
+                break;
+            }
+        }
+
+        // Agregar al resultado
+        $resultado[] = [
+            'butaca_id' => $butaca->id,
+            'fila' => $butaca->fila,
+            'columna' => $butaca->columna,
+            'estado' => $estado,
+            'vip' => $butaca->vip,
+            'precio' => $butaca->precio
+        ];
+    }
+
+    return response()->json($resultado);
 }
 
     

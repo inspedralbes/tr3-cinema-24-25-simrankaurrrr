@@ -183,7 +183,7 @@ const communicationManager = {
 
 
 // Método para reservar una butaca
-reservarButaca(movieSessionId, butacaId) {
+reservarButaca(movieSessionId, butacaIds) {
   const token = getAuthToken();
   if (!token) {
     throw new Error('No se encontró el token de autenticación. Por favor, inicia sesión.');
@@ -191,7 +191,7 @@ reservarButaca(movieSessionId, butacaId) {
 
   return apiClient.post('/reservar-butaca', {
     movie_session_id: movieSessionId,
-    butaca_id: butacaId,
+    butaca_ids: butacaIds,
   }, {
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -200,6 +200,24 @@ reservarButaca(movieSessionId, butacaId) {
   .then(response => response.data)
   .catch(error => {
     console.error('Error reservando la butaca:', error);
+    throw error;
+  });
+},
+
+
+ // Eliminar una reserva
+ eliminarReserva(reservaId) {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('No se encontró el token de autenticación. Inicia sesión.');
+  }
+
+  return apiClient.delete(`/reservas/${reservaId}`, {
+    headers: { 'Authorization': `Bearer ${token}` },
+  })
+  .then(response => response.data)
+  .catch(error => {
+    console.error('Error al eliminar la reserva:', error);
     throw error;
   });
 },
@@ -237,28 +255,42 @@ reservarButaca(movieSessionId, butacaId) {
         throw error;
       });
   },
+// Añadir método para pagar múltiples reservas
+realizarPagoMultiple(reservasData) {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('No se encontró el token de autenticación. Por favor, inicia sesión.');
+  }
 
-  //  Realizar un pago
-  realizarPago(datosPago) {
-    const token = getAuthToken();
-    if (!token) {
-        throw new Error('No se encontró el token de autenticación. Inicia sesión.');
-    }
-
-    if (!datosPago.numero_tarjeta || !datosPago.fecha_vencimiento || !datosPago.cvv || !datosPago.compra_id) {
-        console.error("❌ Error: Falta información en el pago.", datosPago);
-        throw new Error("Datos de pago incompletos.");
-    }
-
-    return apiClient.post('/realizar-pago', datosPago, {
-        headers: { 'Authorization': `Bearer ${token}` },
-    })
-    .then(response => response.data)
-    .catch(error => {
-        console.error('❌ Error al realizar el pago:', error.response ? error.response.data : error);
-        throw error;
-    });
+  return apiClient.post('/realizar-pago-multiple', reservasData, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  })
+  .then(response => response.data)
+  .catch(error => {
+    console.error('Error realizando el pago múltiple:', error);
+    throw error;
+  });
 },
+realizarPago(pagoData) {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('No se encontró el token de autenticación. Por favor, inicia sesión.');
+  }
+
+  return apiClient.post('/realizar-pago', pagoData, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  })
+  .then(response => response.data)
+  .catch(error => {
+    console.error('Error realizando el pago:', error);
+    throw error;
+  });
+},
+
 
   
   // Agregar una butaca al carrito

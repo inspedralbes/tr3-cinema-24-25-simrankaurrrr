@@ -22,6 +22,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/comprar-reserva/{reservaId}', [ButacaController::class, 'comprarReserva']);
     // Rutas para el carrito
     Route::post('/realizar-pago', [PagosController::class, 'realizarPago']);
+    Route::delete('/reservas/{reserva_id}', [ButacaController::class, 'eliminarReserva']);
+    Route::get('/butacas/estado/{session_id}', [ButacaController::class, 'verEstadoSesion']);
 
 Route::post('/agregar-al-carrito', [ButacaController::class, 'agregarAlCarrito']);
 Route::get('/ver-carrito', [ButacaController::class, 'verCarrito']);

@@ -29,7 +29,11 @@ class Butaca extends Model
     {
         return $this->hasMany(Reserva::class);
     }
-
+    // Relación con Compra (muchos a muchos)
+    public function compras()
+    {
+        return $this->belongsToMany(Compra::class);
+    }
     public function reserva()
     {
         return $this->belongsTo(Reserva::class);

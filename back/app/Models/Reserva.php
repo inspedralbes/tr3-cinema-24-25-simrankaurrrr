@@ -1,5 +1,4 @@
 <?php
-// Modelo Reserva
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,7 +9,12 @@ class Reserva extends Model
     use HasFactory;
 
     protected $fillable = [
-        'compras_id', 'user_id', 'movie_session_id', 'butaca_id', 'estado', 'precio'
+        'compra_id', 'user_id', 'movie_session_id', 'butaca_ids', 'estado', 'precio'
+    ];
+
+    // Indicamos que el campo butaca_ids es de tipo JSON y debe ser tratado como un array
+    protected $casts = [
+        'butaca_ids' => 'array',
     ];
 
     public function user()
@@ -23,14 +27,19 @@ class Reserva extends Model
         return $this->belongsTo(MovieSession::class, 'movie_session_id');
     }
 
-    public function butaca()
-    {
-        return $this->belongsTo(Butaca::class, 'butaca_id');
-    }
-
-    // Relación con Compra
     public function compra()
     {
         return $this->belongsTo(Compra::class, 'compra_id');
     }
+     // Relación con Butaca
+     public function butacas()
+     {
+         return $this->hasManyThrough(Butaca::class, ReservaButaca::class, 'reserva_id', 'id', 'id', 'butaca_id');
+     }
+
+
+public function butaca()
+{
+    return $this->belongsTo(Butaca::class);
+}
 }

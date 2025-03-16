@@ -1,6 +1,15 @@
-<!-- index.vue -->
 <template>
   <div class="app-container">
+    <!-- Componente de sesión -->
+    <NuxtLink to="/register" class="text-blue-500 underline hover:text-blue-700 mb-6 inline-block">
+      haz login
+    </NuxtLink>
+
+    <!-- Botón Logout -->
+    <button @click="logout" class="logout-button">
+      Logout
+    </button>
+
     <div class="movie-container">
       <h1 class="title">Películas Recomendadas</h1>
       <MovieList />
@@ -10,6 +19,17 @@
 
 <script setup lang="ts">
 import MovieList from '../components/MovieList.vue';
+
+// Método de logout
+function logout() {
+  // Eliminar el token de localStorage
+  localStorage.removeItem('auth_token');
+
+  // Mostrar un popup de confirmación (puedes cambiar el texto como lo desees)
+  alert('Has cerrado sesión exitosamente');
+
+  // Opcional: Puedes hacer cualquier otra cosa que necesites después del logout
+}
 </script>
 
 <style scoped>
@@ -20,7 +40,9 @@ import MovieList from '../components/MovieList.vue';
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;  /* Cambiado a column para apilar los elementos */
   padding: 20px;
+  gap: 20px;  /* Agregado espacio entre el botón y el contenedor de películas */
 }
 
 /* Contenedor que envuelve el contenido */
@@ -49,6 +71,22 @@ import MovieList from '../components/MovieList.vue';
   text-transform: uppercase;
   letter-spacing: 2px; /* Espaciado entre letras */
   font-family: 'Poppins', sans-serif;
+}
+
+/* Estilos del botón Logout */
+.logout-button {
+  padding: 10px 20px;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #ff1a1a;
 }
 
 /* Media queries para hacer la app más responsiva */

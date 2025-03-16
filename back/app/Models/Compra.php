@@ -9,29 +9,45 @@ class Compra extends Model
 {
     use HasFactory;
 
-    // Tabla asociada al modelo
     protected $table = 'compras';
 
-    // Campos que pueden ser asignados masivamente
     protected $fillable = [
         'user_id',
         'movie_session_id',
+        'butaca_id',  // Añadido el campo butaca_id
         'ticket_quantity',
         'total_amount',
-        'entry_type_id' // Relación con el tipo de entrada
+        'estado'  // Agregar el campo 'estado' para poder actualizarlo
     ];
 
-    // Relación con el modelo 'User'
+    // Relación con User
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // Relación con el modelo 'MovieSession'
+    // Relación con MovieSession
     public function movieSession()
     {
         return $this->belongsTo(MovieSession::class);
     }
 
-   
+// Relación con Butacas (si hay múltiples butacas en una compra)
+public function butacas()
+{
+    return $this->hasMany(Butaca::class);
+}
+
+
+    // Relación con Pagos
+    public function pagos()
+    {
+        return $this->hasMany(Pagos::class, 'compra_id');
+    }
+
+    // Relación con Reserva
+    public function reserva()
+    {
+        return $this->hasOne(Reserva::class, 'compra_id');
+    }
 }

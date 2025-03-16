@@ -1,24 +1,36 @@
 <?php
-
+// Modelo Reserva
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model; // Aquí importamos el Model de Laravel
-use Illuminate\Database\Eloquent\Factories\HasFactory; // Si estás usando Factory
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Reserva extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'user_id', 'movie_session_id', 'butaca_id','precio', 'estado'
+        'compras_id', 'user_id', 'movie_session_id', 'butaca_id', 'estado', 'precio'
     ];
 
-    public function butaca()
+    public function user()
     {
-        return $this->belongsTo(Butaca::class);
+        return $this->belongsTo(User::class);
     }
-
 
     public function movieSession()
     {
-        return $this->belongsTo(MovieSession::class);
+        return $this->belongsTo(MovieSession::class, 'movie_session_id');
+    }
+
+    public function butaca()
+    {
+        return $this->belongsTo(Butaca::class, 'butaca_id');
+    }
+
+    // Relación con Compra
+    public function compra()
+    {
+        return $this->belongsTo(Compra::class, 'compra_id');
     }
 }

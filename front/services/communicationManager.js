@@ -9,8 +9,59 @@ const apiClient = axios.create({
   withCredentials: true,  // Si necesitas enviar cookies
 });
 
+function getAuthToken() {
+  return localStorage.getItem('auth_token');
+}
+
+function setAuthToken(token) {
+  if (token) {
+    apiClient.defaults.headers['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete apiClient.defaults.headers['Authorization'];
+  }
+}
 // El manager de comunicación con los fetches
 const communicationManager = {
+  // Método para registrar un nuevo usuario
+  registerUser(userData) {
+    return apiClient.post('/register', userData)
+      .then(response => {
+        const { auth_token } = response.data;
+        if (auth_token) {
+          localStorage.setItem('auth_token', auth_token);
+          setAuthToken(auth_token); // Establecemos el token en axios
+        }
+        return response.data;
+      })
+      .catch(error => {
+        console.error('Error registering user:', error);
+        throw error;
+      });
+  },
+
+  // Método para login
+  loginUser(credentials) {
+    return apiClient.post('/login', credentials)
+      .then(response => {
+        const { auth_token } = response.data;
+        if (auth_token) {
+          localStorage.setItem('auth_token', auth_token);
+          setAuthToken(auth_token); // Establecemos el token en axios
+        }
+        return response.data;
+      })
+      .catch(error => {
+        console.error('Error logging in:', error);
+        throw error;
+      });
+  },
+
+  // Método para hacer logout
+  logout() {
+    localStorage.removeItem('auth_token');
+    setAuthToken(null); // Eliminamos el token del header de axios
+  },
+
   // Obtener sesiones de una película para una fecha específica
   getSessionsByMovieAndDate(movieId, sessionDate) {
     return apiClient.get(`/sessions/movie/${movieId}/date/${sessionDate}`)
@@ -21,15 +72,7 @@ const communicationManager = {
       });
   },
 
-  // Obtener butacas por sesión
-  getButacasPorSesion(sessionId) {
-    return apiClient.get(`/butacas/sesion/${sessionId}`)
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error fetching seats for session:', error);
-        throw error;
-      });
-  },
+ 
 
   // Obtener las sesiones de una película (por película, sin la fecha)
   getSessionsByMovie(movieId) {
@@ -51,15 +94,6 @@ const communicationManager = {
       });
   },
 
-  // Crear un nuevo usuario
-  createUser(userData) {
-    return apiClient.post('/users', userData)
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error creating user:', error);
-        throw error;
-      });
-  },
 
   // Obtener un usuario por ID
   getUserById(userId) {
@@ -71,16 +105,7 @@ const communicationManager = {
       });
   },
 
-  // Actualizar usuario por ID
-  updateUser(userId, userData) {
-    return apiClient.put(`/users/${userId}`, userData)
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error updating user:', error);
-        throw error;
-      });
-  },
-
+ 
   // Obtener información de una película por ID
   getMovieById(movieId) {
     return apiClient.get(`/movies/${movieId}`)
@@ -93,15 +118,7 @@ const communicationManager = {
 
   
 
-  // Eliminar usuario por ID
-  deleteUser(userId) {
-    return apiClient.delete(`/users/${userId}`)
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error deleting user:', error);
-        throw error;
-      });
-  },
+ 
 
   // Obtener todas las películas
   getMovies() {
@@ -109,36 +126,6 @@ const communicationManager = {
       .then(response => response.data)
       .catch(error => {
         console.error('Error fetching movies:', error);
-        throw error;
-      });
-  },
-
-  // Crear una nueva película
-  createMovie(movieData) {
-    return apiClient.post('/movies', movieData)
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error creating movie:', error);
-        throw error;
-      });
-  },
-
-  // Actualizar película por ID
-  updateMovie(movieId, movieData) {
-    return apiClient.put(`/movies/${movieId}`, movieData)
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error updating movie:', error);
-        throw error;
-      });
-  },
-
-  // Eliminar película por ID
-  deleteMovie(movieId) {
-    return apiClient.delete(`/movies/${movieId}`)
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error deleting movie:', error);
         throw error;
       });
   },
@@ -153,15 +140,6 @@ const communicationManager = {
       });
   },
 
-  // Crear una nueva sesión de cine
-  createSession(sessionData) {
-    return apiClient.post('/sessions', sessionData)
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error creating session:', error);
-        throw error;
-      });
-  },
 
   // Obtener una sesión de cine por ID
   getSessionById(sessionId) {
@@ -169,26 +147,6 @@ const communicationManager = {
       .then(response => response.data)
       .catch(error => {
         console.error('Error fetching session:', error);
-        throw error;
-      });
-  },
-
-  // Actualizar sesión de cine por ID
-  updateSession(sessionId, sessionData) {
-    return apiClient.put(`/sessions/${sessionId}`, sessionData)
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error updating session:', error);
-        throw error;
-      });
-  },
-
-  // Eliminar sesión de cine por ID
-  deleteSession(sessionId) {
-    return apiClient.delete(`/sessions/${sessionId}`)
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error deleting session:', error);
         throw error;
       });
   },
@@ -203,16 +161,6 @@ const communicationManager = {
       });
   },
 
-  // Crear una nueva compra
-  createCompra(compraData) {
-    return apiClient.post('/compras', compraData)
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error creating purchase:', error);
-        throw error;
-      });
-  },
-
   // Obtener compra por ID
   getCompraById(compraId) {
     return apiClient.get(`/compras/${compraId}`)
@@ -222,27 +170,6 @@ const communicationManager = {
         throw error;
       });
   },
-
-  // Actualizar compra por ID
-  updateCompra(compraId, compraData) {
-    return apiClient.put(`/compras/${compraId}`, compraData)
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error updating purchase:', error);
-        throw error;
-      });
-  },
-
-  // Eliminar compra por ID
-  deleteCompra(compraId) {
-    return apiClient.delete(`/compras/${compraId}`)
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error deleting purchase:', error);
-        throw error;
-      });
-  },
-
   // Obtener butacas por sesión
   getButacasPorSesion(sessionId) {
     return apiClient.get(`/butacas/sesion/${sessionId}`)
@@ -253,50 +180,22 @@ const communicationManager = {
       });
   },
 
-  // Actualizar el estado de la butaca por ID
-  updateButaca(butacaId, estado) {
-    return apiClient.put(`/butacas/${butacaId}/estado`, { estado })
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error updating seat:', error);
-        throw error;
-      });
-  },
-
-  // Eliminar butaca por ID
-  deleteButaca(butacaId) {
-    return apiClient.delete(`/butacas/${butacaId}`)
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error deleting seat:', error);
-        throw error;
-      });
-  },
 
 
-  updateButaca(butacaId, estado) {
-    return apiClient.put(`/butacas/${butacaId}/estado`, { estado })
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error updating seat:', error);
-        throw error;
-      });
-  },
-
-  deleteButaca(butacaId) {
-    return apiClient.delete(`/butacas/${butacaId}`)
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error deleting seat:', error);
-        throw error;
-      });
-  },
 // Método para reservar una butaca
-reservarButaca(userId, movieSessionId, butacaId) {
-  return apiClient.post('/butacas/reservar-butaca', {
-    user_id: userId,
+reservarButaca(movieSessionId, butacaId) {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('No se encontró el token de autenticación. Por favor, inicia sesión.');
+  }
+
+  return apiClient.post('/reservar-butaca', {
     movie_session_id: movieSessionId,
     butaca_id: butacaId,
+  }, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
   })
   .then(response => response.data)
   .catch(error => {
@@ -304,6 +203,132 @@ reservarButaca(userId, movieSessionId, butacaId) {
     throw error;
   });
 },
+
+  // Liberar una butaca reservada
+  liberarButaca(sessionId, butacaId) {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('No se encontró el token de autenticación. Inicia sesión.');
+    }
+
+    return apiClient.delete(`/${sessionId}/${butacaId}/liberar`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error al liberar la butaca:', error);
+        throw error;
+      });
+  },
+
+  // Comprar una reserva de butaca
+  comprarReserva(reservaId) {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('No se encontró el token de autenticación. Inicia sesión.');
+    }
+
+    return apiClient.post(`/comprar-reserva/${reservaId}`, {}, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error al comprar la reserva:', error);
+        throw error;
+      });
+  },
+
+  //  Realizar un pago
+  realizarPago(datosPago) {
+    const token = getAuthToken();
+    if (!token) {
+        throw new Error('No se encontró el token de autenticación. Inicia sesión.');
+    }
+
+    if (!datosPago.numero_tarjeta || !datosPago.fecha_vencimiento || !datosPago.cvv || !datosPago.compra_id) {
+        console.error("❌ Error: Falta información en el pago.", datosPago);
+        throw new Error("Datos de pago incompletos.");
+    }
+
+    return apiClient.post('/realizar-pago', datosPago, {
+        headers: { 'Authorization': `Bearer ${token}` },
+    })
+    .then(response => response.data)
+    .catch(error => {
+        console.error('❌ Error al realizar el pago:', error.response ? error.response.data : error);
+        throw error;
+    });
+},
+
+  
+  // Agregar una butaca al carrito
+  agregarAlCarrito(datosCarrito) {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('No se encontró el token de autenticación. Inicia sesión.');
+    }
+
+    return apiClient.post('/agregar-al-carrito', datosCarrito, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error al agregar al carrito:', error);
+        throw error;
+      });
+  },
+  getCarrito() {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('No se encontró el token de autenticación. Por favor, inicia sesión.');
+    }
+  
+    return apiClient.get('/ver-carrito', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error obteniendo el carrito:', error);
+      throw error;
+    });
+  },
+  
+  // Ver el contenido del carrito
+  verCarrito() {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('No se encontró el token de autenticación. Inicia sesión.');
+    }
+
+    return apiClient.get('/ver-carrito', {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error al ver el carrito:', error);
+        throw error;
+      });
+  },
+
+  // Confirmar compra del carrito
+  confirmarCompra() {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('No se encontró el token de autenticación. Inicia sesión.');
+    }
+
+    return apiClient.post('/confirmar-compra', {}, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error al confirmar la compra:', error);
+        throw error;
+      });
+  },
+
 };
 
 export default communicationManager;

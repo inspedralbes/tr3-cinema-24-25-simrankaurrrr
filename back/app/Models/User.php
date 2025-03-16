@@ -2,27 +2,38 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-class User extends Model
+class User extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, Notifiable, HasApiTokens;
 
-    // Tabla asociada al modelo
     protected $table = 'users';
 
-    // Campos que pueden ser asignados masivamente
     protected $fillable = [
         'name',
         'email',
-        'password'
+        'password',
+        'phone',
+        'address',
+        'birthdate',
+        'role',
+        'auth_token'
     ];
 
-    // Relación con la tabla 'compras'
+    protected $hidden = [
+        'password',
+        'remember_token',
+        'auth_token'
+    ];
+
     public function compras()
     {
         return $this->hasMany(Compra::class);
     }
+    
     public function reservas()
     {
         return $this->hasMany(Reserva::class);

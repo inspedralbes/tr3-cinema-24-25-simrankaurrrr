@@ -40,43 +40,56 @@ class MovieSessionController extends Controller
     }
 
     public function store(Request $request)
-    {
-        // Validar los datos de entrada
-        $request->validate([
-            'movie_id' => 'required|exists:movies,id',
-            'session_time' => 'required|in:16:00:00,18:00:00,20:00:00', // Validar que la hora sea válida
-            'session_date' => 'required|date|after:today', // Validar que la fecha sea futura
-            'dia_espectador' => 'required|boolean',
-        ], [
-            'session_time.in' => 'La hora de la sesión debe ser 16:00:00, 18:00:00 o 20:00:00.', // Mensaje personalizado
-            'session_time.required' => 'La hora de la sesión es obligatoria.',
-            'session_date.after' => 'La fecha de la sesión debe ser posterior a hoy.',
-        ]);
+{
+    // Validar los datos de entrada
+    $request->validate([
+        'movie_id' => 'required|exists:movies,id',
+        'session_time' => 'required|in:16:00:00,18:00:00,20:00:00', // Validar que la hora sea válida
+        'session_date' => 'required|date|after:today', // Validar que la fecha sea futura
+        'dia_espectador' => 'required|boolean',
+    ], [
+        'session_time.in' => 'La hora de la sesión debe ser 16:00:00, 18:00:00 o 20:00:00.', // Mensaje personalizado
+        'session_time.required' => 'La hora de la sesión es obligatoria.',
+        'session_date.after' => 'La fecha de la sesión debe ser posterior a hoy.',
+    ]);
     
-        // Verificar si ya existe una sesión para la misma película en el mismo día y hora
-        $existingSession = MovieSession::where('movie_id', $request->movie_id)
-                                       ->whereDate('session_date', $request->session_date)
-                                       ->where('session_time', $request->session_time)
-                                       ->first();
+    // Verificar si la película está disponible para streaming
+    $movie = Movie::find($request->movie_id);
     
-        if ($existingSession) {
-            return response()->json(['message' => 'Ya existe una sesión para esta película en este horario'], 400);
-        }
-    
-        // Crear la nueva sesión
-        try {
-            $session = MovieSession::create($request->all());
-            return response()->json($session, 201);
-        } catch (\Exception $e) {
-            // Si ocurre un error inesperado, lo atrapamos y mostramos un mensaje
-            \Log::error('Error creating session: ', [
-                'error_message' => $e->getMessage(),
-                'error_details' => $e->getTraceAsString(),
-                'request_data' => $request->all(),
-            ]);
-            return response()->json(['message' => 'Error al crear la sesión', 'error' => $e->getMessage()], 500);
-        }
+    if (!$movie) {
+        return response()->json(['message' => 'La película no existe'], 404);
     }
+
+    // Si la columna 'disponible_en_streaming' es 0, no permitir agregar la sesión
+    if ($movie->disponible_en_streaming == 0) {
+        return response()->json(['message' => 'La película no está disponible para agregar sesiones'], 400);
+    }
+    
+    // Verificar si ya existe una sesión para la misma película en el mismo día y hora
+    $existingSession = MovieSession::where('movie_id', $request->movie_id)
+                                   ->whereDate('session_date', $request->session_date)
+                                   ->where('session_time', $request->session_time)
+                                   ->first();
+    
+    if ($existingSession) {
+        return response()->json(['message' => 'Ya existe una sesión para esta película en este horario'], 400);
+    }
+    
+    // Crear la nueva sesión
+    try {
+        $session = MovieSession::create($request->all());
+        return response()->json($session, 201);
+    } catch (\Exception $e) {
+        // Si ocurre un error inesperado, lo atrapamos y mostramos un mensaje
+        \Log::error('Error creating session: ', [
+            'error_message' => $e->getMessage(),
+            'error_details' => $e->getTraceAsString(),
+            'request_data' => $request->all(),
+        ]);
+        return response()->json(['message' => 'Error al crear la sesión', 'error' => $e->getMessage()], 500);
+    }
+}
+
     
 
     public function show($id)

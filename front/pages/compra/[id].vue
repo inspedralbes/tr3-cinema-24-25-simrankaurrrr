@@ -3,5 +3,7 @@
       <NuxtLink to="/" class="text-blue-500 underline hover:text-blue-700 mb-6 inline-block">
         ⬅ Volver
       </NuxtLink>
+      <SessionButton />
+
 </div>
 </template>  

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -8,10 +9,8 @@ class Movie extends Model
 {
     use HasFactory;
 
-    // Tabla asociada al modelo
     protected $table = 'movies';
 
-    // Campos que pueden ser asignados masivamente
     protected $fillable = [
         'title',
         'sinopsis',
@@ -20,10 +19,14 @@ class Movie extends Model
         'actores',
         'año',
         'genero',
-        'poster_url'
+        'poster_url',
+        'trailer_url',
+        'idioma',
+        'subtitulos',
+        'formato',
+        'disponible_en_streaming',
     ];
 
-    // Relación con la tabla 'movie_sessions'
     public function movieSessions()
     {
         return $this->hasMany(MovieSession::class);

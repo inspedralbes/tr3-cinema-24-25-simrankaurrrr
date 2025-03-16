@@ -9,19 +9,25 @@ class MovieController extends Controller
 {
     public function index()
     {
-        $movies = Movie::all();
-        return response()->json($movies);
+        return response()->json(Movie::all());
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'plot' => 'required|string',
+            'sinopsis' => 'required|string',
+            'duracion' => 'required|string',
             'director' => 'required|string',
-            'year' => 'required|integer',
-            'genre' => 'required|string',
+            'actores' => 'required|string',
+            'año' => 'required|integer',
+            'genero' => 'required|string',
             'poster_url' => 'required|string',
+            'trailer_url' => 'nullable|string',
+            'idioma' => 'nullable|string',
+            'subtitulos' => 'boolean',
+            'formato' => 'nullable|string',
+            'disponible_en_streaming' => 'boolean',
         ]);
 
         $movie = Movie::create($request->all());
@@ -31,27 +37,33 @@ class MovieController extends Controller
     public function show($id)
     {
         $movie = Movie::find($id);
-        if ($movie) {
-            return response()->json($movie);
+        if (!$movie) {
+            return response()->json(['message' => 'Película no encontrada'], 404);
         }
-        return response()->json(['message' => 'Película no encontrada'], 404);
+        return response()->json($movie);
     }
-    
 
     public function update(Request $request, $id)
     {
         $movie = Movie::find($id);
         if (!$movie) {
-            return response()->json(['message' => 'Movie not found'], 404);
+            return response()->json(['message' => 'Película no encontrada'], 404);
         }
 
         $request->validate([
             'title' => 'string|max:255',
-            'plot' => 'string',
+            'sinopsis' => 'string',
+            'duracion' => 'string',
             'director' => 'string',
-            'year' => 'integer',
-            'genre' => 'string',
+            'actores' => 'string',
+            'año' => 'integer',
+            'genero' => 'string',
             'poster_url' => 'nullable|string',
+            'trailer_url' => 'nullable|string',
+            'idioma' => 'nullable|string',
+            'subtitulos' => 'boolean',
+            'formato' => 'nullable|string',
+            'disponible_en_streaming' => 'boolean',
         ]);
 
         $movie->update($request->all());
@@ -62,10 +74,32 @@ class MovieController extends Controller
     {
         $movie = Movie::find($id);
         if (!$movie) {
-            return response()->json(['message' => 'Movie not found'], 404);
+            return response()->json(['message' => 'Película no encontrada'], 404);
         }
 
         $movie->delete();
-        return response()->json(['message' => 'Movie deleted successfully']);
+        return response()->json(['message' => 'Película eliminada correctamente']);
+    }
+    public function updateStreamingStatus($movie_id, Request $request)
+    {
+        // Validar que el valor de disponible_en_streaming sea 0 o 1
+        $request->validate([
+            'disponible_en_streaming' => 'required|in:0,1'
+        ]);
+
+        // Buscar la película por ID
+        $movie = Movie::find($movie_id);
+
+        // Si la película no se encuentra, responder con un error 404
+        if (!$movie) {
+            return response()->json(['message' => 'Película no encontrada'], 404);
+        }
+
+        // Actualizar el campo disponible_en_streaming con el valor proporcionado
+        $movie->disponible_en_streaming = $request->input('disponible_en_streaming');
+        $movie->save();
+
+        // Devolver respuesta exitosa
+        return response()->json(['message' => 'Estado de disponibilidad actualizado', 'movie' => $movie]);
     }
 }

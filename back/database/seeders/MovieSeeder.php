@@ -1,4 +1,5 @@
 <?php
+
 namespace Database\Seeders;
 
 use App\Models\Movie;
@@ -6,11 +7,6 @@ use Illuminate\Database\Seeder;
 
 class MovieSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
         Movie::create([
@@ -22,6 +18,11 @@ class MovieSeeder extends Seeder
             'año' => 2025,
             'genero' => 'Acción',
             'poster_url' => 'https://example.com/poster.jpg',
+            'trailer_url' => 'https://youtube.com/trailer1',
+            'idioma' => 'Inglés',
+            'subtitulos' => true,
+            'formato' => 'IMAX',
+            'disponible_en_streaming' => true,
         ]);
 
         Movie::create([
@@ -33,6 +34,11 @@ class MovieSeeder extends Seeder
             'año' => 2024,
             'genero' => 'Comedia',
             'poster_url' => 'https://example.com/poster2.jpg',
+            'trailer_url' => 'https://youtube.com/trailer2',
+            'idioma' => 'Español',
+            'subtitulos' => false,
+            'formato' => '2D',
+            'disponible_en_streaming' => false,
         ]);
     }
 }

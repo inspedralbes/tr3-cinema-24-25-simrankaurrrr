@@ -2,7 +2,8 @@
   <div class="p-6 bg-gray-100 min-h-screen">
     <!-- Componente de sesión global (Login/Logout) -->
     <SessionButton />
-    
+    <Navbar />
+
     <!-- Enlace para volver atrás con estilo -->
     <NuxtLink to="/" class="text-blue-500 underline hover:text-blue-700 mb-6 inline-block">
       ⬅ Volver

@@ -9,12 +9,24 @@ class MovieController extends Controller
 {
     public function index()
     {
-        return response()->json(Movie::all());
+        // Filtra solo las películas disponibles en streaming
+        $movies = Movie::where('disponible_en_streaming', 1)->get();
+        
+        return response()->json($movies);
     }
+    
+ // Este método devuelve todas las películas, sin importar su estado de streaming
+ public function getAllMovies()
+ {
+     // Obtener todas las películas de la base de datos
+     $movies = Movie::all();
 
+     return response()->json($movies);
+ }
     public function store(Request $request)
     {
-        $request->validate([
+        // Validar los datos de la solicitud y almacenar los datos validados en una variable
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
             'sinopsis' => 'required|string',
             'duracion' => 'required|string',
@@ -29,10 +41,14 @@ class MovieController extends Controller
             'formato' => 'nullable|string',
             'disponible_en_streaming' => 'boolean',
         ]);
-
-        $movie = Movie::create($request->all());
+    
+        // Usar los datos validados para crear la película
+        $movie = Movie::create($validated);
+    
+        // Devolver la película creada
         return response()->json($movie, 201);
     }
+    
 
     public function show($id)
     {
@@ -45,30 +61,38 @@ class MovieController extends Controller
 
     public function update(Request $request, $id)
     {
+        // Buscar la película
         $movie = Movie::find($id);
+    
+        // Si no se encuentra la película, retornar error 404
         if (!$movie) {
             return response()->json(['message' => 'Película no encontrada'], 404);
         }
-
-        $request->validate([
-            'title' => 'string|max:255',
-            'sinopsis' => 'string',
-            'duracion' => 'string',
-            'director' => 'string',
-            'actores' => 'string',
-            'año' => 'integer',
-            'genero' => 'string',
+    
+        // Validar los datos enviados en la solicitud
+        $validated = $request->validate([
+            'title' => 'nullable|string|max:255',
+            'sinopsis' => 'nullable|string',
+            'duracion' => 'nullable|string',
+            'director' => 'nullable|string',
+            'actores' => 'nullable|string',
+            'año' => 'nullable|integer',
+            'genero' => 'nullable|string',
             'poster_url' => 'nullable|string',
             'trailer_url' => 'nullable|string',
             'idioma' => 'nullable|string',
-            'subtitulos' => 'boolean',
+            'subtitulos' => 'nullable|boolean',
             'formato' => 'nullable|string',
-            'disponible_en_streaming' => 'boolean',
+            'disponible_en_streaming' => 'nullable|boolean',
         ]);
-
-        $movie->update($request->all());
+    
+        // Actualizar la película con los datos validados
+        $movie->update($validated);
+    
+        // Retornar la película actualizada
         return response()->json($movie);
     }
+    
 
     public function destroy($id)
     {

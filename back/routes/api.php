@@ -24,6 +24,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/realizar-pago', [PagosController::class, 'realizarPago']);
     Route::delete('/reservas/{reserva_id}', [ButacaController::class, 'eliminarReserva']);
     Route::get('/butacas/estado/{session_id}', [ButacaController::class, 'verEstadoSesion']);
+    Route::middleware('auth:sanctum')->get('/user', [UserController::class, 'getCurrentUser']);
+    Route::get('/sesion/resumen', [ButacaController::class, 'obtenerResumenSesion']);
+    Route::patch('movies/{movie_id}/update-streaming-status', [MovieController::class, 'updateStreamingStatus']);
+    Route::get('/movies/all', [MovieController::class, 'getAllMovies']);  // Nueva ruta para obtener todas las películas
+    Route::get('/sessions/movie/{movie_id}', [MovieSessionController::class, 'getSessionsByMovie']);
+    Route::post('/sessions/{id}', [MovieSessionController::class, 'store']);
+
+    Route::get('/movies', [MovieController::class, 'index']);
+
 
 Route::post('/agregar-al-carrito', [ButacaController::class, 'agregarAlCarrito']);
 Route::get('/ver-carrito', [ButacaController::class, 'verCarrito']);
@@ -36,7 +45,6 @@ Route::post('/confirmar-compra', [ButacaController::class, 'confirmarCompra']);}
         Route::get('{id}', [MovieController::class, 'show']);
         Route::put('{id}', [MovieController::class, 'update']);
         Route::delete('{id}', [MovieController::class, 'destroy']);
-        Route::patch('movies/{movie_id}/update-streaming-status', [MovieController::class, 'updateStreamingStatus']);
 
     });
 
@@ -67,5 +75,5 @@ Route::post('/confirmar-compra', [ButacaController::class, 'confirmarCompra']);}
         Route::get('{id}', [ButacaController::class, 'show']);
         Route::put('{id}', [ButacaController::class, 'update']);
         Route::delete('{id}', [ButacaController::class, 'destroy']);
-        
+
     });

@@ -11,7 +11,8 @@ class Movie extends Model
 
     protected $table = 'movies';
 
-    protected $fillable = [
+     // Definir los campos que se pueden asignar masivamente
+     protected $fillable = [
         'title',
         'sinopsis',
         'duracion',
@@ -26,7 +27,7 @@ class Movie extends Model
         'formato',
         'disponible_en_streaming',
     ];
-
+    
     public function movieSessions()
     {
         return $this->hasMany(MovieSession::class);

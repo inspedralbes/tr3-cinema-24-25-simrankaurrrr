@@ -320,6 +320,86 @@ public function verEstadoSesion($session_id)
     return response()->json($resultado);
 }
 
-    
+public function obtenerResumenSesion(Request $request)
+{
+    // Obtener los parámetros de fecha y hora
+    $sessionDate = $request->query('session_date');  // Fecha de la sesión (ej. 2025-03-19)
+    $sessionTime = $request->query('session_time');  // Hora de la sesión (ej. 16:00:00)
+
+    // Buscar la sesión de la película
+    $movieSession = MovieSession::whereDate('session_date', $sessionDate)
+                                ->whereTime('session_time', $sessionTime)
+                                ->first();
+
+    // Si no se encuentra la sesión, devolver un error
+    if (!$movieSession) {
+        return response()->json(['message' => 'Sesión no encontrada para esa fecha y hora'], 404);
+    }
+
+    // Obtener todas las butacas de la sesión
+    $butacas = Butaca::all();
+
+    // Obtener las compras pagadas para esta sesión
+    $comprasPagadas = Compra::where('movie_session_id', $movieSession->id)
+        ->where('estado', 'pagado')
+        ->pluck('butaca_ids')->toArray();
+
+    // Obtener las reservas en proceso para esta sesión
+    $reservasEnProceso = Reserva::where('movie_session_id', $movieSession->id)
+        ->where('estado', 'en_proceso')
+        ->pluck('butaca_ids')->toArray();
+
+    // Convertir JSON a arrays
+    $comprasPagadas = collect($comprasPagadas)->map(fn($c) => json_decode($c, true))->flatten()->toArray();
+    $reservasEnProceso = collect($reservasEnProceso)->map(fn($r) => json_decode($r, true))->flatten()->toArray();
+
+    $resultado = [];
+    $entradasNormal = 0;
+    $entradasVIP = 0;
+    $recaudacionNormal = 0;
+    $recaudacionVIP = 0;
+    $recaudacionTotal = 0;
+
+    foreach ($butacas as $butaca) {
+        $estado = 'disponible';
+
+        // Verificar el estado de la butaca
+        if (in_array($butaca->id, $comprasPagadas)) {
+            $estado = 'comprado';
+            // Calcular recaudación y entradas por tipo
+            if ($butaca->vip) {
+                $entradasVIP++;
+                $recaudacionVIP += $butaca->precio;
+            } else {
+                $entradasNormal++;
+                $recaudacionNormal += $butaca->precio;
+            }
+            $recaudacionTotal += $butaca->precio;
+        } elseif (in_array($butaca->id, $reservasEnProceso)) {
+            $estado = 'reservado';
+        }
+
+        $resultado[] = [
+            'butaca_id' => $butaca->id,
+            'fila' => $butaca->fila,
+            'columna' => $butaca->columna,
+            'estado' => $estado,
+            'vip' => $butaca->vip,
+            'precio' => $butaca->precio,
+        ];
+    }
+
+    // Añadir los cálculos al resultado final
+    $resultadoResumen = [
+        'entradas_normal' => $entradasNormal,
+        'entradas_vip' => $entradasVIP,
+        'recaudacion_normal' => $recaudacionNormal,
+        'recaudacion_vip' => $recaudacionVIP,
+        'recaudacion_total' => $recaudacionTotal,
+        'butacas' => $resultado,
+    ];
+
+    return response()->json($resultadoResumen);
+}
 
 }

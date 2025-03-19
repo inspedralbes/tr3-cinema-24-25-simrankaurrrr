@@ -8,7 +8,6 @@ const apiClient = axios.create({
   },
   withCredentials: true,  // Si necesitas enviar cookies
 });
-
 function getAuthToken() {
   return localStorage.getItem('auth_token');
 }
@@ -22,6 +21,18 @@ function setAuthToken(token) {
 }
 // El manager de comunicación con los fetches
 const communicationManager = {
+
+  getCurrentUser() {
+    return apiClient.get('/user', { // Suponiendo que el backend tiene una ruta "/user" que devuelve el usuario autenticado
+      headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+    })
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error obteniendo usuario autenticado:', error);
+      throw error;
+    });
+  },
+  
   // Método para registrar un nuevo usuario
   registerUser(userData) {
     return apiClient.post('/register', userData)
@@ -72,7 +83,213 @@ const communicationManager = {
       });
   },
 
- 
+
+  // Método para crear una película
+  createMovie(movieData) {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('No se encontró el token de autenticación. Inicia sesión.');
+    }
+
+    // Hacemos el request POST a la API
+    return apiClient
+      .post('/movies', movieData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+      .then(response => {
+        return response.data;  // Devuelve los datos de la película creada
+      })
+      .catch(error => {
+        console.error('Error al crear la película:', error);
+        throw error; // Lanza el error para que lo manejes donde llames a la función
+      });
+  },
+// Obtener todas las películas
+getMovies() {
+  const token = getAuthToken();  // Obtener el token de autenticación
+  if (!token) {
+    throw new Error('No se encontró el token de autenticación. Inicia sesión.');
+  }
+
+  return apiClient.get('/movies', {
+    headers: {
+      'Authorization': `Bearer ${token}`,  // Añadir el token en los headers
+    },
+  })
+  .then(response => response.data)
+  .catch(error => {
+    console.error('Error al obtener las películas:', error);
+    throw error;
+  });
+},
+
+
+   // Eliminar una película
+   deleteMovie(movieId) {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('No se encontró el token de autenticación. Inicia sesión.');
+    }
+
+    return apiClient.delete(`/movies/${movieId}`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error al eliminar la película:', error);
+        throw error;
+      });
+  },
+// Método para actualizar una película
+updateMovie(movieId, movieData) {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('No se encontró el token de autenticación. Inicia sesión.');
+  }
+
+  return apiClient
+    .put(`/movies/${movieId}`, movieData, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error al actualizar la película:', error);
+      throw error; // Lanza el error para que lo manejes donde llames a la función
+    });
+},
+// Modificar esta función para actualizar el estado de streaming
+updateStreamingStatus(movieId, data) {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('No se encontró el token de autenticación. Inicia sesión.');
+  }
+
+  return apiClient.patch(`/movies/${movieId}/update-streaming-status`, data, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  })
+  .then(response => response.data)
+  .catch(error => {
+    console.error('Error al actualizar el estado de streaming:', error);
+    throw error;
+  });
+},
+
+
+getAllMovies() {
+  const token = getAuthToken();  // Obtener el token de autenticación desde el localStorage
+  if (!token) {
+    throw new Error('No se encontró el token de autenticación. Inicia sesión.');
+  }
+
+  // Hacer la solicitud GET a la API para obtener todas las películas
+  return apiClient.get('/movies/all', {  // Esto supone que la ruta es '/movies/all'
+    headers: {
+      'Authorization': `Bearer ${token}`,  // Incluir el token de autenticación en la cabecera
+    },
+  })
+  .then(response => {
+    console.log("Películas obtenidas:", response.data);
+    return response.data;  // Devuelve las películas
+  })
+  .catch(error => {
+    console.error("Error al obtener las películas:", error);
+    // Si el error es 401, el token podría ser inválido o haber expirado
+    if (error.response && error.response.status === 401) {
+      console.error('Token inválido o expirado. Inicia sesión nuevamente.');
+    }
+    throw error;  // Lanza el error para que pueda ser manejado en el frontend
+  });
+
+},
+createSession(sessionData) {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('No se encontró el token de autenticación. Inicia sesión.');
+  }
+
+  return apiClient.post('/sessions', sessionData, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  })
+  .then(response => response.data)
+  .catch(error => {
+    console.error('Error al crear la sesión:', error);
+    throw error;
+  });
+},
+getSessionsByMovie(movieId) {
+  const token = localStorage.getItem('token'); // O el método que uses para almacenar el token
+  return apiClient.get(`/sessions/movie/${movieId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+  .then(response => response.data)
+  .catch(error => {
+    console.error('Error obteniendo sesiones para la película:', error);
+    throw error;
+  });
+},
+
+updateSession(sessionId, sessionData) {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('No se encontró el token de autenticación. Inicia sesión.');
+  }
+
+  return apiClient.put(`/sessions/${sessionId}`, sessionData, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  })
+  .then(response => response.data)
+  .catch(error => {
+    console.error('Error al actualizar la sesión:', error);
+    throw error;
+  });
+},
+deleteSession(sessionId) {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('No se encontró el token de autenticación. Inicia sesión.');
+  }
+
+  return apiClient.delete(`/sessions/${sessionId}`, {
+    headers: { 'Authorization': `Bearer ${token}` },
+  })
+  .then(response => response.data)
+  .catch(error => {
+    console.error('Error al eliminar la sesión:', error);
+    throw error;
+  });
+},
+// Método para añadir una nueva sesión con el movieId en la URL
+addSession(movieId, sessionData) {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('No se encontró el token de autenticación. Por favor, inicia sesión.');
+  }
+
+  // Modificar la URL para incluir el movieId
+  return apiClient.post(`/sessions/${movieId}`, sessionData, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  })
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error añadiendo la sesión:', error);
+      throw error;
+    });
+},
+
 
   // Obtener las sesiones de una película (por película, sin la fecha)
   getSessionsByMovie(movieId) {
@@ -112,20 +329,6 @@ const communicationManager = {
       .then(response => response.data)
       .catch(error => {
         console.error('Error fetching movie:', error);
-        throw error;
-      });
-  },
-
-  
-
- 
-
-  // Obtener todas las películas
-  getMovies() {
-    return apiClient.get('/movies')
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error fetching movies:', error);
         throw error;
       });
   },
@@ -170,6 +373,7 @@ const communicationManager = {
         throw error;
       });
   },
+
   // Obtener butacas por sesión
   getButacasPorSesion(sessionId) {
     return apiClient.get(`/butacas/sesion/${sessionId}`)
@@ -179,8 +383,6 @@ const communicationManager = {
         throw error;
       });
   },
-
-
 
 // Método para reservar una butaca
 reservarButaca(movieSessionId, butacaIds) {
@@ -205,6 +407,7 @@ reservarButaca(movieSessionId, butacaIds) {
 },
 
 
+  
  // Eliminar una reserva
  eliminarReserva(reservaId) {
   const token = getAuthToken();
@@ -255,42 +458,25 @@ reservarButaca(movieSessionId, butacaIds) {
         throw error;
       });
   },
-// Añadir método para pagar múltiples reservas
-realizarPagoMultiple(reservasData) {
-  const token = getAuthToken();
-  if (!token) {
-    throw new Error('No se encontró el token de autenticación. Por favor, inicia sesión.');
-  }
 
-  return apiClient.post('/realizar-pago-multiple', reservasData, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  })
-  .then(response => response.data)
-  .catch(error => {
-    console.error('Error realizando el pago múltiple:', error);
-    throw error;
-  });
-},
-realizarPago(pagoData) {
-  const token = getAuthToken();
-  if (!token) {
-    throw new Error('No se encontró el token de autenticación. Por favor, inicia sesión.');
-  }
-
-  return apiClient.post('/realizar-pago', pagoData, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  })
-  .then(response => response.data)
-  .catch(error => {
-    console.error('Error realizando el pago:', error);
-    throw error;
-  });
-},
-
+  realizarPago(pagoData) {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('No se encontró el token de autenticación. Por favor, inicia sesión.');
+    }
+  
+    return apiClient.post('/realizar-pago', pagoData, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error realizando el pago:', error);
+      throw error;
+    });
+  },
+  
 
   
   // Agregar una butaca al carrito
@@ -360,7 +546,53 @@ realizarPago(pagoData) {
         throw error;
       });
   },
-
+  getOcupacionByDate(movieId, sessionDate, sessionTime) {
+    const token = getAuthToken(); // Obtener token de autenticación
+    if (!token) {
+      console.error('No se encontró el token de autenticación. Inicia sesión.');
+      throw new Error('No se encontró el token de autenticación. Inicia sesión.');
+    }
+  
+    if (!movieId || !sessionDate || !sessionTime) {
+      console.error('Parámetros inválidos para obtener la ocupación.');
+      throw new Error('Faltan parámetros necesarios (movieId, sessionDate, sessionTime).');
+    }
+  
+    // Formatear la fecha a YYYY-MM-DD
+    const formattedDate = new Date(sessionDate).toISOString().split('T')[0];
+  
+    // Asegurar que sessionTime esté en formato HH:MM:SS
+    const formattedTime = sessionTime.length === 5 ? `${sessionTime}:00` : sessionTime;
+  
+    return apiClient.get(`/sesion/resumen?session_date=${formattedDate}&session_time=${formattedTime}`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+      .then(response => {
+        const { entradas_normal, entradas_vip, recaudacion_normal, recaudacion_vip, recaudacion_total, butacas } = response.data;
+  
+        console.log("Resumen de sesión:", {
+          entradas_normal,
+          entradas_vip,
+          recaudacion_normal,
+          recaudacion_vip,
+          recaudacion_total,
+          butacas
+        });
+  
+        return {
+          entradasNormal: entradas_normal,
+          entradasVIP: entradas_vip,
+          recaudacionNormal: recaudacion_normal,
+          recaudacionVIP: recaudacion_vip,
+          recaudacionTotal: recaudacion_total,
+          butacas
+        };
+      })
+      .catch(error => {
+        console.error('Error obteniendo ocupación para la fecha y película:', error.response?.data?.message || error.message);
+        throw error;
+      });
+  }
 };
 
 export default communicationManager;

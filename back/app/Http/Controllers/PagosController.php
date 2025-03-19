@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Validator;
 
 class PagosController extends Controller
 {
-    // Modificación para aceptar pagos individuales y múltiples
     public function realizarPago(Request $request)
     {
         // Validación: Aceptar una compra_id o un array de compra_ids
@@ -20,6 +19,9 @@ class PagosController extends Controller
             'cvv' => 'required|string|max:3',
             'compra_id' => 'required|array', // Esperamos un array de compra_ids
             'compra_id.*' => 'exists:compras,id', // Validamos que cada compra_id exista en la base de datos
+            'nombre' => 'required|string|max:255',
+            'apellido' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
         ]);
 
         // Si la validación falla, devolver el error
@@ -37,6 +39,9 @@ class PagosController extends Controller
         $pago->numero_tarjeta = $request->numero_tarjeta;
         $pago->fecha_vencimiento = $request->fecha_vencimiento;
         $pago->cvv = $request->cvv;
+        $pago->nombre = $request->nombre;  // Asignar el nombre
+        $pago->apellido = $request->apellido;  // Asignar el apellido
+        $pago->email = $request->email;  // Asignar el correo electrónico
         $pago->compra_id = null; // Se asignará más tarde cuando se procese cada compra
 
         // Si el pago fue exitoso, procesar las compras

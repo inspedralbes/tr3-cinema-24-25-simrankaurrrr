@@ -17,6 +17,9 @@ class Pagos extends Model
         'numero_tarjeta',
         'fecha_vencimiento',
         'cvv',
+        'nombre', 
+        'apellido', 
+        'email',
     ];
 
     public $timestamps = true;

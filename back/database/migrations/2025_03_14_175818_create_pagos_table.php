@@ -14,6 +14,9 @@ class CreatePagosTable extends Migration
             $table->string('numero_tarjeta');  // Número de tarjeta
             $table->string('fecha_vencimiento');  // Fecha de vencimiento de la tarjeta
             $table->string('cvv');  // Código CVV
+            $table->string('nombre');  // Nombre del titular de la tarjeta
+            $table->string('apellido');  // Apellido del titular de la tarjeta
+            $table->string('email');  // Email del titular de la tarjeta
             $table->timestamps();  // Tiempos de creación y actualización
         });
     }

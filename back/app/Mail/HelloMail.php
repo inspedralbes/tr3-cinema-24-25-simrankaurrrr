@@ -20,14 +20,20 @@ class HelloMail extends Mailable
     public $apellido;
     private $pdfPath;
 
-    // Constructor
-    public function __construct($nombre, $apellido = null)
+    public function __construct($nombre, $apellido, $pdfPath)
     {
         $this->nombre = $nombre;
         $this->apellido = $apellido;
-
-        // Generar el PDF
-        $this->pdfPath = $this->generatePDF();
+        $this->pdfPath = $pdfPath;
+    }
+    
+    public function attachments(): array
+    {
+        return [
+            Attachment::fromPath($this->pdfPath)
+                ->as('confirmacion_pago.pdf')
+                ->withMime('application/pdf')
+        ];
     }
 
     public function envelope(): Envelope
@@ -48,14 +54,6 @@ class HelloMail extends Mailable
         );
     }
 
-    public function attachments(): array
-    {
-        return [
-            Attachment::fromPath($this->pdfPath)
-                ->as('confirmacion.pdf')
-                ->withMime('application/pdf')
-        ];
-    }
 
     private function generatePDF()
     {

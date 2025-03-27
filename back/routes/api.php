@@ -20,7 +20,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('{session_id}/{butaca_id}/liberar', [ButacaController::class, 'liberarButaca']);
     Route::post('/reservar-butaca', [ButacaController::class, 'reservarButaca']);
     Route::post('/comprar-reserva/{reservaId}', [ButacaController::class, 'comprarReserva']);
-    // Rutas para el carrito
     Route::post('/realizar-pago', [PagosController::class, 'realizarPago']);
     Route::delete('/reservas/{reserva_id}', [ButacaController::class, 'eliminarReserva']);
     Route::get('/butacas/estado/{session_id}', [ButacaController::class, 'verEstadoSesion']);
@@ -30,9 +29,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/movies/all', [MovieController::class, 'getAllMovies']);  // Nueva ruta para obtener todas las películas
     Route::get('/sessions/movie/{movie_id}', [MovieSessionController::class, 'getSessionsByMovie']);
     Route::post('/sessions/{id}', [MovieSessionController::class, 'store']);
-
     Route::get('/movies', [MovieController::class, 'index']);
 
+    Route::get('/user-role', [UserController::class, 'getUserRole']);
 
 Route::post('/agregar-al-carrito', [ButacaController::class, 'agregarAlCarrito']);
 Route::get('/ver-carrito', [ButacaController::class, 'verCarrito']);

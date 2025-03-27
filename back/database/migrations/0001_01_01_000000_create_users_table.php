@@ -35,6 +35,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('ip_address')->nullable();
             $table->text('user_agent')->nullable();
+            $table->longText('payload'); // Agregado campo 'payload'
+            $table->integer('last_activity'); // Agregado campo 'last_activity'
             $table->timestamps();
         });
     }

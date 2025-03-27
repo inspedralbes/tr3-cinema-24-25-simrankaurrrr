@@ -128,5 +128,20 @@ class UserController extends Controller
 {
     return response()->json($request->user());
 }
+// Obtener el rol del usuario basado en el token
+public function getUserRole(Request $request)
+{
+    // Obtener el usuario autenticado
+    $user = Auth::user();
 
+    if ($user) {
+        // Retornar el rol del usuario
+        return response()->json([
+            'role' => $user->role,
+        ]);
+    }
+
+    // Si no hay usuario autenticado, retornar un error
+    return response()->json(['message' => 'Unauthorized'], 401);
+}
 }

@@ -1,8 +1,10 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import communicationManager from '~/services/communicationManager';
+import { useRoute, useRouter } from 'vue-router';
 
 // Variables reactivas
+const router = useRouter();
 const user = ref(null);
 const movies = ref([]);
 const selectedMovieId = ref(null);
@@ -12,6 +14,8 @@ const sessions = ref([]);
 const newSessionDate = ref('');
 const newSessionTime = ref('');
 const isDiaEspectador = ref(false); // Asegúrate de incluir esta variable reactiva para el checkbox
+const isVisible = ref(false);
+const message = ref('');
 
 // Verificar el rol del usuario
 const checkUserRole = async () => {
@@ -25,6 +29,20 @@ const checkUserRole = async () => {
     console.error('Error obteniendo usuario:', error);
     user.value = null;
   }
+};
+
+// Función para mostrar la alerta
+const showAlert = (msg) => {
+  message.value = msg;
+  isVisible.value = true;
+  setTimeout(() => {
+    closeAlert();
+  }, 3000); // Cierra la alerta después de 3 segundos
+};
+
+// Función para cerrar la alerta
+const closeAlert = () => {
+  isVisible.value = false;
 };
 
 // Obtener todas las películas
@@ -69,7 +87,6 @@ const addSession = async () => {
   };
 
   try {
-    // Ahora pasas `selectedMovieId.value` como `movieId`
     const createdSession = await communicationManager.addSession(selectedMovieId.value, newSession);
     sessions.value.push(createdSession);
 
@@ -77,15 +94,14 @@ const addSession = async () => {
     newSessionDate.value = '';
     newSessionTime.value = '';
 
-    alert('Sesión añadida correctamente');
+    showAlert('Sesión añadida correctamente');
   } catch (error) {
     console.error('Error añadiendo sesión:', error);
 
-    // Aquí verificamos si el error tiene un mensaje relacionado con la disponibilidad de streaming
     if (error.response && error.response.data.error === 'La película no está disponible para sesiones en streaming') {
-      alert('No se puede añadir la sesión. Esta película no está disponible para streaming.');
+      showAlert('No se puede añadir la sesión. Esta película no está disponible para streaming.');
     } else {
-      alert('Error al añadir la sesión');
+      showAlert('Error al añadir la sesión');
     }
   }
 };
@@ -95,63 +111,77 @@ const fetchStreamingStatus = async () => {
 
   const selectedMovie = movies.value.find(movie => movie.id === selectedMovieId.value);
 
-  // Verificar si se encuentra la película y si tiene disponible_en_streaming
   if (selectedMovie && selectedMovie.hasOwnProperty('disponible_en_streaming')) {
     console.log("Estado de Streaming de la película seleccionada: ", selectedMovie.disponible_en_streaming);
     streamingStatus.value = selectedMovie.disponible_en_streaming;
   } else {
     console.error("No se encontró el estado de streaming para esta película");
-    streamingStatus.value = null;  // Fallback en caso de que no se encuentre el dato
+    streamingStatus.value = null;
   }
 };
 
-// Actualizar el estado de streaming en el backend y en el frontend
+const deleteSession = async (sessionId) => {
+  try {
+    await communicationManager.deleteSession(sessionId);
+    sessions.value = sessions.value.filter(session => session.id !== sessionId);
+    showAlert('Sesión eliminada correctamente');
+  } catch (error) {
+    console.error('Error eliminando sesión:', error);
+    showAlert('Error al eliminar la sesión');
+  }
+};
+
 const updateStreamingStatus = async () => {
   try {
     loading.value = true;
     const newStatus = streamingStatus.value === 1 ? 0 : 1;
     await communicationManager.updateStreamingStatus(selectedMovieId.value, { disponible_en_streaming: newStatus });
-    
-    // Actualizamos el estado en el frontend para reflejar el cambio
+
     streamingStatus.value = newStatus; // Actualiza el valor de streamingStatus para reflejar el cambio
-    alert('Estado actualizado correctamente');
+    showAlert('Estado actualizado correctamente');
   } catch (error) {
     console.error('Error actualizando estado:', error);
-    alert('Error al actualizar el estado');
+    showAlert('Error al actualizar el estado');
   } finally {
     loading.value = false;
   }
+
 };
-
+function goBack() {
+  router.go(-1); // Navega a la página anterior
+};
 watch(selectedMovieId, async () => {
-  console.log("ID de película seleccionada:", selectedMovieId.value); // Verifica el id seleccionado
-
-  await fetchStreamingStatus();  // Actualiza el estado de streaming cuando cambie la película
-  fetchSessions();                // Asegúrate de que también se carguen las sesiones
+  console.log("ID de película seleccionada:", selectedMovieId.value);
+  await fetchStreamingStatus();
+  fetchSessions();
 });
-
 
 // Cargar datos al montar el componente
 onMounted(() => {
   checkUserRole();
 });
+
+defineExpose({
+  showAlert
+});
 </script>
 
-
 <template>
-      <Navbar />
+  <Navbar />
 
-  <NuxtLink to="/" class="text-blue-500 underline hover:text-blue-700 mb-6 inline-block">
+  <button @click="goBack" class="back-link">
       ⬅ Volver
+    </button>
+
+  <NuxtLink to="crud1" class="crud-link">
+    Consulta Administrativa
     </NuxtLink>
-  <NuxtLink to="crud1" class="login-link">
-            CRUD 1
-          </NuxtLink>
-          <NuxtLink to="crud3" class="login-link">
-            CRUD 3
-          </NuxtLink>
+  <NuxtLink to="crud3" class="crud-link">
+    Administrar Películas
+  </NuxtLink>
+
   <div v-if="user?.role === 'admin'" class="p-6">
-    <h1 class="text-2xl font-bold mb-4">Administrar Películas</h1>
+    <h1 class="text-2xl font-bold mb-4">Administrar Películas y Sessions</h1>
     <div>
       <label for="movie" class="text-lg">Selecciona una Película:</label>
       <select v-model="selectedMovieId" class="border px-4 py-2 rounded w-full">
@@ -163,15 +193,14 @@ onMounted(() => {
 
     <div v-if="selectedMovieId !== null" class="mt-4">
       <p class="text-lg">Estado actual: 
-  <strong>{{ streamingStatus === 1 ? 'Disponible' : 'No Disponible' }}</strong>
-</p>
+        <strong>{{ streamingStatus === 1 ? 'Disponible' : 'No Disponible' }}</strong>
+      </p>
 
-      <button 
-        @click="updateStreamingStatus" >
-        Update status      </button>
+      <button @click="updateStreamingStatus" :disabled="loading">
+        Update status
+      </button>
     </div>
 
-    <!-- Formulario para añadir una nueva sesión -->
     <div v-if="selectedMovieId !== null" class="mt-6">
       <h2 class="text-xl font-semibold">Añadir nueva sesión</h2>
       <form @submit.prevent="addSession">
@@ -192,35 +221,28 @@ onMounted(() => {
           <label for="dia_espectador">¿Es día espectador?</label>
           <input v-model="isDiaEspectador" type="checkbox" />
         </div>
-        <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">
+        <button type="submit">
           Añadir sesión
         </button>
       </form>
     </div>
 
-    <!-- Mostrar sesiones si hay -->
     <div v-if="sessions.length > 0" class="mt-6">
       <h2 class="text-xl font-semibold">Sesiones disponibles</h2>
       <ul class="list-disc ml-6">
         <li v-for="session in sessions" :key="session.id" class="flex justify-between items-center">
           <span>{{ session.session_date }} - {{ session.session_time }}</span>
-          <button 
-            @click="deleteSession(session.id)" 
-            class="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
-            aria-label="Eliminar sesión"
-          >
+          <button @click="deleteSession(session.id)" class="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600" aria-label="Eliminar sesión">
             Eliminar
           </button>
         </li>
       </ul>
     </div>
 
-    <!-- Mostrar mensaje de carga si está cargando -->
     <div v-if="loading" class="mt-6 text-blue-500 text-lg">
       Cargando sesiones...
     </div>
 
-    <!-- Mostrar mensaje si NO hay sesiones pero solo si hay una película seleccionada -->
     <div v-else-if="selectedMovieId !== null && sessions.length === 0 && !loading" class="mt-6 text-gray-500 text-lg">
       No hay sesiones disponibles para esta película.
     </div>
@@ -229,15 +251,169 @@ onMounted(() => {
   <div v-else class="text-center p-6 text-red-500 text-xl font-bold">
     No tienes permisos para ver esta sección.
   </div>
-</template>
 
+  <!-- Popup de alerta -->
+  <div v-if="isVisible" class="alert-popup">
+    <div class="alert-content">
+      <p class="alert-message">{{ message }}</p>
+      <button @click="closeAlert" class="close-btn">Cerrar</button>
+    </div>
+  </div>
+</template>
 <style scoped>
+.back-link {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #2b2d42;
+  color: #8d99ae;
+  border: 2px solid #8d99ae;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 20px;
+  transition: all 0.3s;
+}
+
+.back-link:hover {
+  color: #ef233c;
+  border-color: #ef233c;
+}
+
+.crud-link {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #2b2d42;
+  color: #edf2f4;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 10px;
+  transition: all 0.3s;
+}
+
+.crud-link:hover {
+  background-color: #ef233c;
+}
+
+.p-6 {
+  padding: 1.5rem;
+  background-color: #edf2f4;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+  color: #2b2d42;
+}
+
+h1, h2 {
+  color: #2b2d42;
+  margin-bottom: 20px;
+}
+
+select, input[type="date"] {
+  background-color: #edf2f4;
+  border: 2px solid #8d99ae;
+  padding: 10px;
+  border-radius: 4px;
+  width: 100%;
+  margin-bottom: 15px;
+  color: #2b2d42;
+}
+
+select:focus, input[type="date"]:focus {
+  border-color: #ef233c;
+  outline: none;
+}
+
 button {
+  padding: 10px 20px;
+  background-color: #2b2d42;
+  color: #edf2f4;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
+  font-weight: bold;
+  margin: 5px;
+  transition: all 0.3s;
+}
+
+button:hover {
+  background-color: #ef233c;
+  transform: translateY(-2px);
 }
 
 button:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  padding: 10px;
+  margin: 5px 0;
+  background-color: #8d99ae;
+  color: #edf2f4;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.alert-popup {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ef233c;
+  color: #edf2f4;
+  padding: 15px 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #edf2f4;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-left: 15px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) translateX(-50%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateX(-50%);
+  }
+}
+
+.text-red-500 {
+  color: #d80032;
+}
+
+@media (max-width: 768px) {
+  .p-6 {
+    margin: 10px;
+    padding: 1rem;
+  }
+  
+  li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  button {
+    margin-top: 10px;
+    width: 100%;
+  }
 }
 </style>

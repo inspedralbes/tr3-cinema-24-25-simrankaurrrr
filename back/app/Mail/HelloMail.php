@@ -29,9 +29,16 @@ class HelloMail extends Mailable
     
     public function attachments(): array
     {
+        $path = storage_path('app/public/' . $this->pdfPath);
+        
+        if (!file_exists($path)) {
+            Log::error("El archivo PDF no existe en: {$path}");
+            return [];
+        }
+    
         return [
-            Attachment::fromPath($this->pdfPath)
-                ->as('confirmacion_pago.pdf')
+            Attachment::fromPath($path)
+                ->as('entradas_cine.pdf')
                 ->withMime('application/pdf')
         ];
     }
@@ -39,20 +46,21 @@ class HelloMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Confirmación de Pago',
+            subject: 'Entradas de Cine - Confirmación de Compra',
         );
     }
 
     public function content(): Content
-    {
-        return new Content(
-            view: 'mail.hella',
-            with: [
-                'nombre' => $this->nombre,
-                'apellido' => $this->apellido,
-            ]
-        );
-    }
+{
+    return new Content(
+        view: 'mail.hella',
+        with: [
+            'nombre' => $this->nombre,
+            'apellido' => $this->apellido,
+            'pdfPath' => $this->pdfPath, // Pasar la ruta del PDF a la vista
+        ]
+    );
+}
 
 
     private function generatePDF()
@@ -65,7 +73,7 @@ class HelloMail extends Mailable
         $pdf = Pdf::loadView('pdf.confirmacion', $data);
 
         // Guardar el PDF temporalmente en storage
-        $pdfPath = storage_path('app/public/confirmacion.pdf');
+        $pdfPath = storage_path('app/public/download.pdf');
         $pdf->save($pdfPath);
 
         return $pdfPath;

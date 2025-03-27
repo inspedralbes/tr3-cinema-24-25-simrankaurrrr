@@ -1,15 +1,11 @@
+
 <?php
 return [
-    'supports_credentials' => true,
-
-    'allowed_origins' => [
-        '*',  // Dirección de tu frontend
-        // Añade más orígenes si es necesario
-    ],
-
-    'allowed_methods' => ['*'],  // Permite todos los métodos HTTP (GET, POST, PUT, DELETE, etc.)
-    'allowed_headers' => ['*'],  // Permite todos los encabezados
-
+    'paths' => ['api/*'], // Rutas a las que se aplicará CORS
+    'allowed_methods' => ['*'], // Métodos permitidos (GET, POST, etc.)
+    'allowed_origins' => ['http://localhost:3000'], // Orígenes permitidos
+    'allowed_headers' => ['*'], // Cabeceras permitidas
     'exposed_headers' => [],
     'max_age' => 0,
+    'supports_credentials' => true, // Habilita el soporte para credenciales
 ];

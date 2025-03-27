@@ -32,8 +32,6 @@ const communicationManager = {
       throw error;
     });
   },
-  
-  // Método para registrar un nuevo usuario
   registerUser(userData) {
     return apiClient.post('/register', userData)
       .then(response => {
@@ -592,7 +590,25 @@ reservarButaca(movieSessionId, butacaIds) {
         console.error('Error obteniendo ocupación para la fecha y película:', error.response?.data?.message || error.message);
         throw error;
       });
+  },
+
+  // Método para obtener el rol del usuario autenticado
+getUserRole() {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('No se encontró el token de autenticación. Inicia sesión.');
   }
+
+  return apiClient.get('/user-role', {
+    headers: { 'Authorization': `Bearer ${token}` },
+  })
+  .then(response => response.data.role) // Suponiendo que el backend devuelve { role: "admin" }
+  .catch(error => {
+    console.error('Error obteniendo el rol del usuario:', error);
+    throw error;
+  });
+},
+
 };
 
 export default communicationManager;

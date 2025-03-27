@@ -8,7 +8,6 @@ use App\Models\Reserva;
 use App\Models\MovieSession;
 use App\Models\User;
 use App\Models\Compra;
-
 use App\Models\Pagos; // Asegúrate de importar el modelo de Pagos
 use Illuminate\Http\Request;
 

@@ -18,8 +18,6 @@ class DatabaseSeeder extends Seeder
             MovieSeeder::class,
             MovieSessionSeeder::class,
             ButacaSeeder::class,
-            ReservaSeeder::class,   
-            CompraSeeder::class,    
 
         ]);
     }

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Crear un cliente de API con configuración básica
 const apiClient = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api',  // El prefijo base para las rutas de la API
+  baseURL: 'http://mdvd.daw.inspedralbes.cat/back/public/api',  // El prefijo base para las rutas de la API
   headers: {
     'Content-Type': 'application/json', // Asegúrate de que el servidor acepte JSON
   },

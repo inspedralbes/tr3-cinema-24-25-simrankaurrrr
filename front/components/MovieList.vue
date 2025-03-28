@@ -21,7 +21,7 @@
                 </div>
                 <h4><strong>Sinopsis:</strong> {{ movie.sinopsis }}</h4>
                 <div class="buttons">
-                  <button class="download-btn" @click="downloadMoviePDF">Descargar PDF</button>
+                  <button class="download-btn" @click="downloadMoviePDF">Descargar Información</button>
                                                     <button class="buy-tickets-btn" @click="goToMoviePage(activeMovie?.id)">Comprar Entradas</button>
                   <button class="trailer-btn" @click="playTrailer(movie.trailer_url)">Ver Trailer</button>
                 </div>
@@ -311,7 +311,6 @@ onMounted(fetchMovies);
   font-size: 14px;
   border-radius: 5px;
 }
-
 .buy-tickets-btn {
   width: 180px;
   padding: 12px 0;
@@ -331,7 +330,6 @@ onMounted(fetchMovies);
   opacity: 0.8;
   box-shadow: 5px 5px 25px rgba(0, 0, 0, 0.753);
 }
-
 .buy-tickets-btn:active {
   transform: scale(0.98);
 }
@@ -435,14 +433,17 @@ onMounted(fetchMovies);
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.753);
 }
 
-.trailer-btn {
-  background-color: #edf2f4;
-  color: #2b2d42;
-}
 
 .trailer-btn:hover {
-  opacity: 0.8;
+  background-color: #6a7485;
+  color: #edf2f4;
   box-shadow: 5px 5px 25px rgba(0, 0, 0, 0.753);
+}
+
+.download-btn:active,
+.buy-tickets-btn:active,
+.trailer-btn:active {
+  transform: scale(0.98);
 }
 
 .movie-details {
@@ -482,7 +483,7 @@ onMounted(fetchMovies);
 /* ESTILOS PARA THUMBNAILS */
 .thumbnail-container {
   position: absolute;
-  bottom: 150px;
+  bottom: 180px;
   left: 0;
   right: 0;
   overflow: hidden;
@@ -614,8 +615,8 @@ onMounted(fetchMovies);
   border-radius: 20px;
   transition: 0.3s;
   cursor: pointer;
-  background-color: #4CAF50; /* Cambio de color a verde */
-  color: white;
+  background-color: #2b2d42;
+  color: #edf2f4;
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.753);
   display: flex;
   align-items: center;
@@ -623,8 +624,9 @@ onMounted(fetchMovies);
   gap: 5px;
 }
 
+
 .download-btn:hover {
-  background-color: #45a049;
+  background-color: #1a1b2a;
   opacity: 0.9;
   box-shadow: 5px 5px 25px rgba(0, 0, 0, 0.753);
 }

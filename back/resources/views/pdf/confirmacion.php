@@ -23,79 +23,75 @@
             padding: 0;
             margin: 0;
             background-color: #f9f9f9;
+            font-size: 12px;
         }
         
         .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 30px;
+            width: 100%;
+            padding: 15px;
             background-color: var(--white);
-            box-shadow: var(--shadow);
-            border-radius: 10px;
-            margin-top: 30px;
-            margin-bottom: 30px;
+            margin: 0 auto;
         }
         
         .header {
             text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
             border-bottom: 2px solid var(--medium);
         }
         
         .logo {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: bold;
             color: var(--primary);
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
         
         h1 { 
             color: var(--primary-dark);
             margin: 0;
-            font-size: 28px;
+            font-size: 20px;
             letter-spacing: -0.5px;
         }
         
         h2 {
             color: var(--dark);
-            font-size: 20px;
-            margin-top: 30px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid var(--light);
+            font-size: 16px;
+            margin-top: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--light);
         }
         
         .info-section {
             background-color: var(--light);
-            padding: 20px;
-            border-radius: 8px;
-            margin: 25px 0;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            font-size: 11px;
         }
         
         .info-item {
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
         
         .info-item strong {
             color: var(--dark);
             display: inline-block;
-            min-width: 80px;
+            min-width: 60px;
         }
         
         table { 
             width: 100%; 
             border-collapse: collapse; 
-            margin: 25px 0;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 10px;
         }
         
         th, td { 
-            padding: 15px;
+            padding: 8px;
             text-align: center;
             border: 1px solid var(--light);
         }
@@ -105,124 +101,110 @@
             color: var(--white);
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 14px;
-            letter-spacing: 0.5px;
+            font-size: 10px;
         }
         
         tr:nth-child(even) {
             background-color: var(--light);
         }
         
-        tr:hover {
-            background-color: #e2e7eb;
-        }
-        
         .total-section {
             text-align: right;
-            margin-top: 30px;
-            padding: 20px;
+            margin-top: 15px;
+            padding: 10px;
             background-color: var(--dark);
             color: var(--white);
-            border-radius: 8px;
+            border-radius: 5px;
+            font-size: 12px;
         }
         
         .total-price {
-            font-size: 24px;
+            font-size: 16px;
             color: var(--white);
             font-weight: bold;
         }
         
         .footer {
             text-align: center;
-            margin-top: 90px;
-            padding-top: 20px;
+            margin-top: 15px;
+            padding-top: 10px;
             border-top: 1px solid var(--light);
             color: var(--medium);
-            font-size: 14px;
+            font-size: 10px;
         }
         
         .movie-title {
             font-weight: 600;
             color: var(--primary-dark);
+            font-size: 11px;
         }
 
         /* Estilos para los QR */
         .qr-section {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
+            margin-top: 15px;
+            padding: 10px;
             text-align: center;
         }
 
         .qr-title {
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             color: var(--primary-dark);
+            font-size: 12px;
         }
 
         .qr-container {
             display: inline-block;
-            margin: 15px;
+            margin: 5px;
             text-align: center;
             vertical-align: top;
+            page-break-inside: avoid;
         }
 
         .qr-code {
-            width: 150px;
-            height: 150px;
+            width: 80px;
+            height: 80px;
             margin: 0 auto;
             display: block;
             border: 1px solid #ddd;
-            padding: 5px;
+            padding: 3px;
             background: white;
         }
 
         .qr-info {
-            margin-top: 10px;
-            font-size: 14px;
+            margin-top: 5px;
+            font-size: 9px;
             color: var(--dark);
-            max-width: 150px;
+            max-width: 100px;
         }
         
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-                margin: 15px;
-            }
-            
-            .info-section {
-                grid-template-columns: 1fr;
-            }
-            
-            th, td {
-                padding: 10px 5px;
-                font-size: 14px;
-            }
-
-            .qr-container {
-                margin: 10px;
-            }
-            
+        .qr-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;
         }
-        .download-btn {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 8px 15px;
-    background-color: #d80032;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    font-size: 14px;
-    text-align: center;
-    transition: all 0.3s ease;
-}
-
-.download-btn:hover {
-    background-color: #b30028;
-    transform: translateY(-2px);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
+        
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+        
+        @media print {
+            body {
+                font-size: 10pt;
+            }
+            .container {
+                width: 100%;
+                padding: 0;
+                margin: 0;
+                box-shadow: none;
+            }
+            .qr-code {
+                width: 70px;
+                height: 70px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -283,31 +265,23 @@
         <div class="qr-section">
             <p class="qr-title">Escanea este código para verificar tu entrada</p>
             
-            <div style="display: flex; flex-wrap: wrap; justify-content: center;">
-            <?php foreach ($butacas as $butaca): ?>
-    <?php if(isset($butaca['qr_code'])): ?>
-        <div class="qr-container">
-    <img src="<?php echo e($butaca['qr_code']); ?>" class="qr-code" alt="Código QR">
-    <div class="qr-info">
-        <?php echo e($butaca['movie']['title']); ?><br>
-        Fecha: <?php echo e(date('d/m/Y', strtotime($butaca['session']['session_date']))); ?><br>
-        Hora: <?php echo e($butaca['session']['session_time']); ?><br>
-        Asiento: <?php echo e($butaca['fila']); ?><?php echo e($butaca['columna']); ?>
-    </div>
-    
-    <!-- Botón de descarga con URL exacta -->
-    <a href="<?php echo e(Storage::url("comprobante_{$nombre}_{$apellido}_" . time() . ".pdf")); ?>" 
-       class="download-btn"
-       style="display: inline-block; margin-top: 10px; padding: 8px 15px; background-color: #d80032; color: white; text-decoration: none; border-radius: 4px; font-size: 14px;">
-       Descargar Entrada
-    </a>
-</div>
-    <?php endif; ?>
-   
-        </div>
+            <div class="qr-row">
+                <?php foreach ($butacas as $butaca): ?>
+                    <?php if(isset($butaca['qr_code'])): ?>
+                        <div class="qr-container">
+                            <img src="<?php echo e($butaca['qr_code']); ?>" class="qr-code" alt="Código QR">
+                            <div class="qr-info">
+                                <?php echo e($butaca['movie']['title']); ?><br>
+                                Fecha: <?php echo e(date('d/m/Y', strtotime($butaca['session']['session_date']))); ?><br>
+                                Hora: <?php echo e($butaca['session']['session_time']); ?><br>
+                                Asiento: <?php echo e($butaca['fila']); ?><?php echo e($butaca['columna']); ?>
 
-<?php endforeach; ?>
-            
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
+        </div>
 
         <div class="footer">
             <p>Gracias por tu compra. Presenta este código QR en taquilla para canjear tus entradas.</p>

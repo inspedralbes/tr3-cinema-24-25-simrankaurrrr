@@ -1,10 +1,10 @@
 <template>
-            <Navbar />
+    <Navbar />
 
     <div class="my-tickets-page">
         <button @click="goBack" class="back-button">
-      ⬅ Volver
-    </button>
+            ⬅ Volver
+        </button>
         <div class="tickets-container">
             <h1>Mis Entradas</h1>
 
@@ -54,7 +54,7 @@
                                     <p><strong>📅 Fecha:</strong> {{ formatDate(ticket.session_date) }}</p>
                                     <p><strong>🕒 Hora:</strong> {{ ticket.session_time }}</p>
                                     <p><strong>💺 Butacas:</strong> {{ formatSeats(ticket.butaca_ids) }}</p>
-                                    <p><strong>💰 Total:</strong> {{ ticket.total_amount }}€</p>
+                                    <p><strong>💰 Total:</strong> {{ formatPrice(ticket.total_amount) }}</p>
                                 </div>
 
                                 <div class="ticket-actions">
@@ -75,7 +75,7 @@
                     </div>
                 </div>
 
-                <!-- Entradas en Proceso -->
+                <!-- Reservas en Proceso -->
                 <div v-if="activeTab === 'pending'">
                     <div class="section-header">
                         <h2>⏳ Reservas en Proceso</h2>
@@ -83,9 +83,10 @@
                     </div>
 
                     <div v-if="pendingTickets.length > 0" class="tickets-grid">
-                        <div v-for="reserva in pendingTickets" :key="reserva.id" class="ticket-card pending">
+                        <div v-for="reserva in pendingTickets" :key="reserva.reserva_id" class="ticket-card pending">
                             <div class="ticket-poster">
-                                <img :src="reserva.movie_poster" :alt="reserva.movie_title">
+                                <img :src="reserva.movie_poster || 'https://via.placeholder.com/300x450'"
+                                    :alt="reserva.movie_title">
                                 <div class="pending-overlay">
                                     <span>En Carrito</span>
                                 </div>
@@ -97,21 +98,18 @@
                                 </div>
 
                                 <div class="ticket-details">
-                                    <p><strong>📅 Fecha:</strong> {{ reserva.session_date }}</p>
+                                    <p><strong>📅 Fecha:</strong> {{ formatDate(reserva.session_date) }}</p>
                                     <p><strong>🕒 Hora:</strong> {{ reserva.session_time }}</p>
-                                    <p><strong>💺 Butaca:</strong> {{ formatSeat(reserva.butaca_ids[0]) }}</p>
-                                    <p><strong>💰 Precio:</strong> {{ reserva.total_amount }}€</p>
-                                    <p class="expiry-warning" v-if="reserva.expires_soon">
-                                        ⚠️ La reserva expira en {{ reserva.expires_in }} horas
-                                    </p>
+                                    <p><strong>💺 Butaca:</strong> {{ formatSeat(reserva.butaca) }}</p>
+                                    <p><strong>💰 Precio:</strong> {{ formatPrice(reserva.total_amount) }}</p>
                                 </div>
 
                                 <div class="ticket-actions">
                                     <button class="action-btn pay-btn" @click="completePayment()">
                                         Completar Pago
                                     </button>
-                                    <button class="action-btn cancel-btn" @click="cancelReservation(reserva.id)">
-                                        Cancelar Reserva
+                                    <button class="action-btn cancel-btn" @click="eliminarReserva(reserva)">
+                                        ❌ Eliminar
                                     </button>
                                 </div>
                             </div>
@@ -120,10 +118,11 @@
 
                     <div v-else class="empty-section">
                         <p>No tienes reservas en tu carrito</p>
+                        <router-link to="/" class="browse-btn">Explorar Películas</router-link>
                     </div>
                 </div>
 
-                <!-- Entradas Pasadas (Histórico) -->
+                <!-- Entradas Pasadas -->
                 <div v-if="activeTab === 'past'">
                     <div class="section-header">
                         <h2>📜 Histórico de Entradas</h2>
@@ -149,7 +148,7 @@
                                     <p><strong>📅 Fecha:</strong> {{ formatDate(ticket.session_date) }}</p>
                                     <p><strong>🕒 Hora:</strong> {{ ticket.session_time }}</p>
                                     <p><strong>💺 Butacas:</strong> {{ formatSeats(ticket.butaca_ids) }}</p>
-                                    <p><strong>💰 Total:</strong> {{ ticket.total_amount }}€</p>
+                                    <p><strong>💰 Total:</strong> {{ formatPrice(ticket.total_amount) }}</p>
                                     <p v-if="ticket.rating" class="rating-display">
                                         <strong>⭐ Valoración:</strong>
                                         <span class="stars">{{ getStars(ticket.rating) }}</span>
@@ -178,13 +177,12 @@
                     </div>
                 </div>
 
-                <!-- Modal de valoración (fuera de los tabs) -->
+                <!-- Modal de valoración -->
                 <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
                     <div class="modal-content">
                         <h3>Valorar {{ currentMovieTitle }}</h3>
                         <div class="rating-stars">
-                            <span v-for="star in 5" :key="star" 
-                                @click="setRating(star)"
+                            <span v-for="star in 5" :key="star" @click="setRating(star)"
                                 :class="{ 'active': star <= currentRating }">
                                 ★
                             </span>
@@ -218,12 +216,24 @@ export default {
         const loading = ref(true);
         const error = ref(null);
         const activeTab = ref('future');
-
-        // Variables para el modal de rating
+        const carritoReservas = ref([]);
         const showModal = ref(false);
         const currentRating = ref(0);
         const currentTicket = ref(null);
         const currentMovieTitle = ref('');
+
+        const eliminarReserva = async (reserva) => {
+            try {
+                await communicationManager.eliminarReserva(reserva.reserva_id);
+                carritoReservas.value = carritoReservas.value.filter(
+                    r => r.reserva_id !== reserva.reserva_id
+                );
+                console.log('Reserva eliminada correctamente');
+            } catch (err) {
+                console.error('Error eliminando reserva:', err);
+                error.value = 'No se pudo eliminar la reserva';
+            }
+        };
 
         const fetchTickets = async () => {
             try {
@@ -267,7 +277,7 @@ export default {
                 );
 
                 tickets.value = ticketsWithDetails;
-
+                await fetchCarritoReservas();
             } catch (err) {
                 console.error('Error al obtener entradas:', err);
                 error.value = err.message || 'No se pudieron cargar tus entradas';
@@ -276,14 +286,100 @@ export default {
             }
         };
 
-        const formatSeat = (seatId) => {
-            const fila = String.fromCharCode(65 + Math.floor((seatId - 1) / 10));
-            const numero = ((seatId - 1) % 10) + 1;
-            return `${fila}${numero}`;
+        const fetchCarritoReservas = async () => {
+            try {
+                const carritoData = await communicationManager.getCarrito();
+                console.log("Datos CRUDOS del carrito:", carritoData);
+                
+                const reservasConDetalles = await Promise.all(
+                    carritoData.map(async reserva => {
+                        try {
+                            const sessionDetails = await communicationManager.getSessionById(reserva.session_id);
+                            const movieDetails = await communicationManager.getMovieById(sessionDetails.movie_id);
+
+                            return {
+                                id: reserva.reserva_id,
+                                movie_title: movieDetails.title,
+                                movie_poster: movieDetails.poster_url || 'https://via.placeholder.com/300x450',
+                                session_date: sessionDetails.session_date,
+                                session_time: sessionDetails.session_time,
+                                room_name: sessionDetails.room_name,
+                                movie_id: sessionDetails.movie_id,
+                                butaca: {
+                                    fila: reserva.fila,
+                                    columna: reserva.columna
+                                },
+                                total_amount: Number(reserva.precio) || 0,
+                                estado: 'en_proceso',
+                                reserva_id: reserva.reserva_id,
+                                fila: reserva.fila,
+                                columna: reserva.columna,
+                                nombre_pelicula: reserva.nombre_pelicula
+                            };
+                        } catch (err) {
+                            console.error('Error obteniendo detalles para reserva', reserva.reserva_id, err);
+                            return {
+                                id: reserva.reserva_id,
+                                movie_title: reserva.nombre_pelicula || `Sesión ${reserva.session_id}`,
+                                movie_poster: 'https://via.placeholder.com/300x450',
+                                session_date: 'Fecha no disponible',
+                                session_time: 'Hora no disponible',
+                                butaca: {
+                                    fila: reserva.fila || 0,
+                                    columna: reserva.columna || 0
+                                },
+                                total_amount: Number(reserva.precio) || 0,
+                                estado: 'en_proceso',
+                                reserva_id: reserva.reserva_id,
+                                fila: reserva.fila || 0,
+                                columna: reserva.columna || 0,
+                                nombre_pelicula: reserva.nombre_pelicula
+                            };
+                        }
+                    })
+                );
+
+                carritoReservas.value = reservasConDetalles;
+            } catch (err) {
+                console.error('Error al obtener el carrito:', err);
+                carritoReservas.value = [];
+            }
         };
 
+        const formatSeat = (seat) => {
+    if (!seat) return 'No disponible';
+    
+    // Si es un objeto con fila/columna
+    if (seat.fila !== undefined && seat.columna !== undefined) {
+        const filaChar = String.fromCharCode(65 + (Number(seat.fila) || 0));
+        const columnaNum = (Number(seat.columna) || 0); // <- Quitamos el +1 aquí
+        return `${filaChar}${columnaNum}`;
+    }
+    
+    // Si es un ID numérico
+    if (typeof seat === 'number') {
+        const fila = String.fromCharCode(65 + Math.floor((seat - 1) / 10));
+        const numero = ((seat - 1) % 10); // <- Quitamos el +1 aquí
+        return `${fila}${numero}`;
+    }
+    
+    return 'No disponible';
+};
+
         const formatSeats = (seats) => {
+            if (!seats || !Array.isArray(seats)) return 'No disponible';
             return seats.map(seatId => formatSeat(seatId)).join(', ');
+        };
+
+        const formatPrice = (amount) => {
+            const num = Number(amount);
+            return isNaN(num) ? '0.00€' : num.toFixed(2) + '€';
+        };
+
+        const formatDate = (dateString) => {
+            if (!dateString) return 'Fecha no disponible';
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('es-ES', options);
         };
 
         const futureTickets = computed(() => {
@@ -295,7 +391,7 @@ export default {
         });
 
         const pendingTickets = computed(() => {
-            return tickets.value.filter(ticket => ticket.estado === 'en_proceso');
+            return carritoReservas.value;
         });
 
         const pastTickets = computed(() => {
@@ -306,11 +402,6 @@ export default {
             });
         });
 
-        const formatDate = (dateString) => {
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            return new Date(dateString).toLocaleDateString('es-ES', options);
-        };
-
         const viewMovie = (movieId) => {
             router.push(`/movies/${movieId}`);
         };
@@ -319,179 +410,167 @@ export default {
             router.push(`/compra`);
         };
 
-        const cancelReservation = async (ticketId) => {
-            if (confirm('¿Estás seguro de que quieres cancelar esta reserva?')) {
-                try {
-                    await communicationManager.eliminarReserva(ticketId);
-                    tickets.value = tickets.value.filter(ticket => ticket.id !== ticketId);
-                    alert('Reserva cancelada con éxito');
-                } catch (err) {
-                    console.error('Error al cancelar reserva:', err);
-                    alert('No se pudo cancelar la reserva: ' + (err.message || 'Error desconocido'));
-                }
+        const downloadTicket = (ticketId) => {
+            const ticket = tickets.value.find(t => t.id === ticketId);
+            if (!ticket) return;
+
+            // Configuración del documento (85x55mm - tamaño estándar de entrada)
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: [85, 55]
+            });
+
+            // Dimensiones del documento
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+
+            // Margen lateral
+            const margin = 10;
+
+            // Función para texto centrado
+            const centeredText = (text, y, fontSize = 10, isBold = false) => {
+                doc.setFontSize(fontSize);
+                doc.setFont("helvetica", isBold ? "bold" : "normal");
+                const textWidth = doc.getStringUnitWidth(text) * fontSize / doc.internal.scaleFactor;
+                const x = (pageWidth - textWidth) / 2;
+                doc.text(text, x, y);
+            };
+
+            // 1. Fondo
+            doc.setFillColor(43, 45, 66); // Azul oscuro
+            doc.rect(0, 0, pageWidth, pageHeight, 'F');
+
+            // 2. Encabezado con color
+            doc.setFillColor(239, 35, 60); // Rojo
+            doc.rect(0, 0, pageWidth, 12, 'F');
+
+            // Texto del encabezado
+            doc.setTextColor(237, 242, 244); // Blanco
+            centeredText("ENTRADA DE CINE", 8, 10, true);
+
+            // 3. Línea divisoria
+            doc.setDrawColor(237, 242, 244); // Blanco
+            doc.setLineWidth(0.3);
+            doc.line(margin, 14, pageWidth - margin, 14);
+
+            // 4. Título de la película (con manejo de caracteres especiales)
+            const movieTitle = ticket.movie_title
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .substring(0, 25)
+                .toUpperCase();
+
+            doc.setTextColor(237, 242, 244); // Blanco
+            centeredText(movieTitle, 22, 9, true);
+
+            // 5. Detalles de la entrada
+            doc.setFontSize(7);
+            doc.setTextColor(237, 242, 244); // Blanco
+
+            // Formatear fecha
+            const options = { weekday: 'short', day: '2-digit', month: 'short' };
+            const formattedDate = new Date(ticket.session_date)
+                .toLocaleDateString('es-ES', options);
+
+            centeredText(`Fecha: ${formattedDate}`, 28);
+            centeredText(`Hora: ${ticket.session_time.substring(0, 5)}`, 32);
+            centeredText(`Butaca: ${formatSeat(ticket.butaca_ids[0])}`, 40);
+            centeredText(`Precio: ${ticket.total_amount} €`, 36);
+            // 6. Código de ticket
+            doc.setFontSize(5);
+            doc.setTextColor(150, 150, 150); // Gris
+
+            // Línea divisoria
+            const lineLength = 40;
+            const lineX = (pageWidth - lineLength) / 2;
+            doc.line(lineX, 48, lineX + lineLength, 48);
+
+            centeredText(`Emisión: ${new Date().toLocaleDateString('es-ES')}`, 54);
+
+            // 7. Guardar el PDF
+            const safeFilename = `Entrada_${movieTitle.replace(/\s+/g, '_')}_${ticket.id}.pdf`;
+            doc.save(safeFilename);
+        };
+
+
+
+        const downloadReceipt = (ticketId) => {
+            const ticket = tickets.value.find(t => t.id === ticketId);
+            if (!ticket) {
+                console.error("Entrada no encontrada");
+                return;
+            }
+
+            try {
+                const doc = new jsPDF();
+
+                // Colores
+                const primaryColor = [239, 35, 60]; // Rojo
+                const secondaryColor = [43, 45, 66]; // Azul oscuro
+
+                // Encabezado
+                doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+                doc.rect(0, 0, 210, 30, 'F');
+                doc.setFontSize(20);
+                doc.setTextColor(255, 255, 255);
+                doc.text('FACTURA DE COMPRA', 105, 20, { align: 'center' });
+
+                // Información de la factura
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0);
+                doc.text(`Factura #${ticket.id}`, 20, 45);
+                doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 20, 50);
+
+                // Detalles de la película
+                doc.setFontSize(14);
+                doc.text(ticket.movie_title, 20, 65);
+
+                doc.setFontSize(12);
+                doc.text(`Fecha de la sesión: ${ticket.session_date}`, 20, 75);
+                doc.text(`Hora: ${ticket.session_time}`, 20, 80);
+                doc.text(`Sala: ${ticket.room_name || 'N/A'}`, 20, 85);
+                doc.text(`Butacas: ${ticket.butaca_ids.join(', ')}`, 20, 90);
+
+                // Tabla de precios
+                doc.setFontSize(12);
+                doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+                doc.text('Concepto', 20, 110);
+                doc.text('Cantidad', 120, 110);
+                doc.text('Precio', 160, 110);
+                doc.text('Total', 190, 110);
+
+                doc.setDrawColor(200, 200, 200);
+                doc.line(20, 112, 190, 112);
+
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.text('Entrada general', 20, 120);
+                doc.text(ticket.butaca_ids.length.toString(), 120, 120, { align: 'right' });
+                doc.text('10.00 €', 160, 120, { align: 'right' });
+                doc.text(`${(ticket.butaca_ids.length * 10).toFixed(2)} €`, 190, 120, { align: 'right' });
+
+                // Total
+                doc.setFontSize(12);
+                doc.setFont("helvetica", "bold");
+                doc.text('TOTAL:', 160, 140);
+                doc.text(`${ticket.total_amount} €`, 190, 140, { align: 'right' });
+
+                // Pie de página
+                doc.setFontSize(10);
+                doc.setTextColor(150, 150, 150);
+                doc.text('Gracias por su compra', 105, 280, { align: 'center' });
+                doc.text('CineApp - Todos los derechos reservados', 105, 285, { align: 'center' });
+
+                // Guardar el PDF
+                const filename = `Factura_${ticket.movie_title.replace(/[^\w]/g, '_')}_${ticket.id}.pdf`;
+                doc.save(filename);
+
+            } catch (error) {
+                console.error("Error al generar la factura:", error);
+                alert("Error al generar la factura. Por favor inténtalo de nuevo.");
             }
         };
-        const downloadTicket = (ticketId) => {
-  const ticket = tickets.value.find(t => t.id === ticketId);
-  if (!ticket) return;
-
-  // Configuración del documento (85x55mm - tamaño estándar de entrada)
-  const doc = new jsPDF({
-    orientation: 'portrait',
-    unit: 'mm',
-    format: [85, 55]
-  });
-
-  // Dimensiones del documento
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  
-  // Margen lateral
-  const margin = 10;
-  
-  // Función para texto centrado
-  const centeredText = (text, y, fontSize = 10, isBold = false) => {
-    doc.setFontSize(fontSize);
-    doc.setFont("helvetica", isBold ? "bold" : "normal");
-    const textWidth = doc.getStringUnitWidth(text) * fontSize / doc.internal.scaleFactor;
-    const x = (pageWidth - textWidth) / 2;
-    doc.text(text, x, y);
-  };
-
-  // 1. Fondo
-  doc.setFillColor(43, 45, 66); // Azul oscuro
-  doc.rect(0, 0, pageWidth, pageHeight, 'F');
-
-  // 2. Encabezado con color
-  doc.setFillColor(239, 35, 60); // Rojo
-  doc.rect(0, 0, pageWidth, 12, 'F');
-  
-  // Texto del encabezado
-  doc.setTextColor(237, 242, 244); // Blanco
-  centeredText("ENTRADA DE CINE", 8, 10, true);
-
-  // 3. Línea divisoria
-  doc.setDrawColor(237, 242, 244); // Blanco
-  doc.setLineWidth(0.3);
-  doc.line(margin, 14, pageWidth - margin, 14);
-
-  // 4. Título de la película (con manejo de caracteres especiales)
-  const movieTitle = ticket.movie_title
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .substring(0, 25)
-    .toUpperCase();
-  
-  doc.setTextColor(237, 242, 244); // Blanco
-  centeredText(movieTitle, 22, 9, true);
-
-  // 5. Detalles de la entrada
-  doc.setFontSize(7);
-  doc.setTextColor(237, 242, 244); // Blanco
-
-  // Formatear fecha
-  const options = { weekday: 'short', day: '2-digit', month: 'short' };
-  const formattedDate = new Date(ticket.session_date)
-    .toLocaleDateString('es-ES', options);
-  
-  centeredText(`Fecha: ${formattedDate}`, 28);
-  centeredText(`Hora: ${ticket.session_time.substring(0, 5)}`, 32);
-  centeredText(`Butaca: ${formatSeat(ticket.butaca_ids[0])}`, 40);
-  centeredText(`Precio: ${ticket.total_amount} €`, 36);
-  // 6. Código de ticket
-  doc.setFontSize(5);
-  doc.setTextColor(150, 150, 150); // Gris
-  
-  // Línea divisoria
-  const lineLength = 40;
-  const lineX = (pageWidth - lineLength) / 2;
-  doc.line(lineX, 48, lineX + lineLength, 48);
-  
-  centeredText(`Emisión: ${new Date().toLocaleDateString('es-ES')}`, 54);
-
-  // 7. Guardar el PDF
-  const safeFilename = `Entrada_${movieTitle.replace(/\s+/g, '_')}_${ticket.id}.pdf`;
-  doc.save(safeFilename);
-};
-
-
-
-const downloadReceipt = (ticketId) => {
-  const ticket = tickets.value.find(t => t.id === ticketId);
-  if (!ticket) {
-    console.error("Entrada no encontrada");
-    return;
-  }
-
-  try {
-    const doc = new jsPDF();
-    
-    // Colores
-    const primaryColor = [239, 35, 60]; // Rojo
-    const secondaryColor = [43, 45, 66]; // Azul oscuro
-
-    // Encabezado
-    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    doc.rect(0, 0, 210, 30, 'F');
-    doc.setFontSize(20);
-    doc.setTextColor(255, 255, 255);
-    doc.text('FACTURA DE COMPRA', 105, 20, { align: 'center' });
-
-    // Información de la factura
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
-    doc.text(`Factura #${ticket.id}`, 20, 45);
-    doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 20, 50);
-
-    // Detalles de la película
-    doc.setFontSize(14);
-    doc.text(ticket.movie_title, 20, 65);
-    
-    doc.setFontSize(12);
-    doc.text(`Fecha de la sesión: ${ticket.session_date}`, 20, 75);
-    doc.text(`Hora: ${ticket.session_time}`, 20, 80);
-    doc.text(`Sala: ${ticket.room_name || 'N/A'}`, 20, 85);
-    doc.text(`Butacas: ${ticket.butaca_ids.join(', ')}`, 20, 90);
-
-    // Tabla de precios
-    doc.setFontSize(12);
-    doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
-    doc.text('Concepto', 20, 110);
-    doc.text('Cantidad', 120, 110);
-    doc.text('Precio', 160, 110);
-    doc.text('Total', 190, 110);
-
-    doc.setDrawColor(200, 200, 200);
-    doc.line(20, 112, 190, 112);
-
-    doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
-    doc.text('Entrada general', 20, 120);
-    doc.text(ticket.butaca_ids.length.toString(), 120, 120, { align: 'right' });
-    doc.text('10.00 €', 160, 120, { align: 'right' });
-    doc.text(`${(ticket.butaca_ids.length * 10).toFixed(2)} €`, 190, 120, { align: 'right' });
-
-    // Total
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text('TOTAL:', 160, 140);
-    doc.text(`${ticket.total_amount} €`, 190, 140, { align: 'right' });
-
-    // Pie de página
-    doc.setFontSize(10);
-    doc.setTextColor(150, 150, 150);
-    doc.text('Gracias por su compra', 105, 280, { align: 'center' });
-    doc.text('CineApp - Todos los derechos reservados', 105, 285, { align: 'center' });
-
-    // Guardar el PDF
-    const filename = `Factura_${ticket.movie_title.replace(/[^\w]/g, '_')}_${ticket.id}.pdf`;
-    doc.save(filename);
-
-  } catch (error) {
-    console.error("Error al generar la factura:", error);
-    alert("Error al generar la factura. Por favor inténtalo de nuevo.");
-  }
-};
 
         const getStars = (rating) => {
             return '★'.repeat(rating) + '☆'.repeat(5 - rating);
@@ -536,6 +615,7 @@ const downloadReceipt = (ticketId) => {
             loading,
             error,
             activeTab,
+            eliminarReserva,
             futureTickets,
             pendingTickets,
             pastTickets,
@@ -545,7 +625,6 @@ const downloadReceipt = (ticketId) => {
             formatSeats,
             viewMovie,
             completePayment,
-            cancelReservation,
             downloadTicket,
             downloadReceipt,
             getStars,
@@ -553,34 +632,88 @@ const downloadReceipt = (ticketId) => {
             closeModal,
             setRating,
             submitRating,
+            carritoReservas, 
             showModal,
             currentRating,
-            currentMovieTitle
-                };
+            currentMovieTitle,
+            formatPrice
+        };
     }
 };
 </script>
 
 <style scoped>
+/* Estilos para el botón de eliminar - igual que en el carrito */
+.action-btn.cancel-btn {
+    background-color: #d80032;
+    color: #edf2f4;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.action-btn.cancel-btn:hover {
+    background-color: #691e06;
+    transform: translateY(-2px);
+}
+
+/* Estilo para el overlay de reservado */
+.pending-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 193, 7, 0.7);
+    color: #2b2d42;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 1.2rem;
+}
+
+/* Ajustes para la tarjeta de reserva */
+.ticket-card.pending {
+    border-left: 4px solid #FFC107;
+}
+
+.ticket-status.pending {
+    background-color: #FFC107;
+    color: #2b2d42;
+}
+
 .back-button {
-  background-color: #2b2d42;
-  color: #8d99ae;
-  border: 2px solid #8d99ae;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s;
-  margin: 20px;
-  font-size: 1rem;
-  position: relative; /* Añade esto */
-  z-index: 10; /* Asegura que esté por encima de otros elementos */
+    background-color: #2b2d42;
+    color: #8d99ae;
+    border: 2px solid #8d99ae;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin: 20px;
+    font-size: 1rem;
+    position: relative;
+    /* Añade esto */
+    z-index: 10;
+    /* Asegura que esté por encima de otros elementos */
 }
 
 .back-button:hover {
-  color: #ef233c;
-  border-color: #ef233c;
+    color: #ef233c;
+    border-color: #ef233c;
 }
+
 /* Unificar estilos de overlay */
 .pending-overlay,
 .past-overlay {
@@ -711,12 +844,7 @@ h1 {
     object-fit: cover;
 }
 
-.ticket-info {
-    width: 60%;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-}
+
 
 .ticket-header {
     display: flex;
@@ -774,10 +902,21 @@ h1 {
     font-weight: bold;
 }
 
+.ticket-info {
+    width: 60%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    /* Añadido para incluir padding en el ancho */
+}
+
 .ticket-actions {
     display: flex;
     gap: 10px;
     margin-top: 15px;
+    padding: 0 5px;
+    /* Añadido para espacio en los lados */
 }
 
 .action-btn {
@@ -1036,6 +1175,11 @@ h1 {
         width: 100%;
     }
 
+    .ticket-info {
+        padding: 15px;
+        /* Reducido para móviles */
+    }
+
     .tabs {
         flex-direction: column;
         align-items: center;
@@ -1045,19 +1189,72 @@ h1 {
         width: 100%;
         justify-content: center;
     }
+
+    /* Botones en móviles */
+    .ticket-actions {
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 10px;
+        /* Más espacio en los lados */
+    }
+
+    .action-btn {
+        width: 100%;
+        padding: 10px;
+        font-size: 0.9rem;
+        margin: 0;
+        /* Asegura que no haya márgenes adicionales */
+    }
+
+    .ticket-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .ticket-status {
+        align-self: flex-start;
+    }
 }
 
 @media (max-width: 576px) {
+    .ticket-card {
+        min-width: 280px;
+    }
+
+    .ticket-details p {
+        font-size: 0.85rem;
+        margin: 6px 0;
+    }
+
+    .ticket-header h3 {
+        font-size: 1.1rem;
+    }
+
+    /* Más espacio para botones en pantallas muy pequeñas */
     .ticket-actions {
-        flex-direction: column;
+        padding: 0 15px;
+    }
+}
+
+@media (max-width: 400px) {
+    .ticket-poster {
+        height: 150px;
     }
 
-    .modal-content {
-        padding: 20px;
+    .ticket-info {
+        padding: 12px;
+    }
+}
+
+@media (max-width: 350px) {
+    .action-btn span.text {
+        display: none;
     }
 
-    .rating-stars {
-        font-size: 2rem;
+    .action-btn::before {
+        content: attr(data-icon);
+        margin-right: 0;
     }
 }
 </style>

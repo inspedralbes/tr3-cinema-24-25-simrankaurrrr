@@ -73,16 +73,26 @@ class PagosController extends Controller
                         $codigoUnico = Str::uuid()->toString();
                         $butacaArray['codigo_unico'] = $codigoUnico;
 
-                        // URL pública del PDF (usando storage)
-                        $pdfUrl = Storage::url($pdfFileName);
+                        // Create JSON data for QR code
+                        $jsonData = json_encode([
+                            'codigo_unico' => $codigoUnico,
+                            'nombre' => $request->nombre,
+                            'apellido' => $request->apellido,
+                            'pelicula' => $sessionCompra->movie->title,
+                            'fecha' => $sessionCompra->date,
+                            'hora' => $sessionCompra->time,
+                            'asiento' => $butaca->numero,
+                            'precio' => $butaca->precio,
+                            'sala' => $sessionCompra->room_id
+                        ]);
                         
-                        // Generar QR que apunte directamente al PDF
+                        // Generate QR code with JSON data
                         $qrCode = QrCode::format('svg')
                             ->size(200)
-                            ->generate(url($pdfUrl));
+                            ->generate($jsonData);
                         
                         $butacaArray['qr_code'] = 'data:image/svg+xml;base64,' . base64_encode($qrCode);
-                        $butacaArray['qr_url'] = url($pdfUrl); // URL completa para el QR
+                        $butacaArray['qr_data'] = $jsonData; // Store the JSON data
                         
                         $butacasConInfo[] = $butacaArray;
                     }
@@ -98,11 +108,10 @@ class PagosController extends Controller
                 'compras' => $compras,
                 'butacas' => $butacasConInfo,
                 'precio_total' => $precioTotal,
-                'pdf_filename' => $pdfFileName // Añade esta línea
-
+                'pdf_filename' => $pdfFileName
             ];
 
-            // Generar y guardar el PDF
+            // Generar y guardar el PDF (opcional, si aún quieres enviarlo por correo)
             $pdf = Pdf::loadView('pdf.confirmacion', $data);
             $pdf->save(storage_path("app/{$pdfPath}"));
 
@@ -117,7 +126,7 @@ class PagosController extends Controller
                 return response()->json([
                     'message' => 'Pago procesado con éxito y correo enviado con PDF adjunto.',
                     'pdf_url' => url(Storage::url($pdfFileName)),
-                    'qr_url' => url(Storage::url($pdfFileName)) // Misma URL para el QR
+                    'butacas' => $butacasConInfo // Return the seats with QR data
                 ], 200);
                 
             } catch (\Exception $e) {
@@ -126,7 +135,7 @@ class PagosController extends Controller
                     'message' => 'Pago procesado pero hubo un error al enviar el correo.',
                     'error' => $e->getMessage(),
                     'pdf_url' => url(Storage::url($pdfFileName)),
-                    'qr_url' => url(Storage::url($pdfFileName))
+                    'butacas' => $butacasConInfo // Return the seats with QR data
                 ], 200);
             }
         }
@@ -150,40 +159,34 @@ class PagosController extends Controller
     // Método para verificar el código QR
     public function verificarQR(Request $request)
     {
-        $codigo = $request->input('codigo');
-        $nombre = $request->input('nombre');
-        $apellido = $request->input('apellido');
-        $pelicula = $request->input('pelicula');
-        $fecha = $request->input('fecha');
-        $hora = $request->input('hora');
-        $asiento = $request->input('asiento');
-        $precio = $request->input('precio');
-    
-        // Verificación en la base de datos (implementa tu lógica)
-        $valido = true; 
-    
-        return view('verificacion.qr', [
+        $qrData = $request->input('qr_data');
+        
+        if (!$qrData) {
+            return response()->json(['error' => 'No se proporcionaron datos QR'], 400);
+        }
+        
+        $data = json_decode($qrData, true);
+        
+        if (!$data) {
+            return response()->json(['error' => 'Datos QR inválidos'], 400);
+        }
+        
+        // Verificar en la base de datos
+        $valido = $this->validarCodigoQR($data['codigo_unico']);
+        
+        return response()->json([
             'valido' => $valido,
-            'codigo' => $codigo,
-            'cliente' => $nombre . ' ' . $apellido,
-            'pelicula' => $pelicula,
-            'fecha' => $fecha,
-            'hora' => $hora,
-            'asiento' => $asiento,
-            'precio' => $precio,
-            'pdf_url' => url(Storage::url("comprobante_{$nombre}_{$apellido}_*.pdf"))
+            'data' => $data
         ]);
     }
 
-    // Método para validar el código QR (ejemplo)
+    // Método para validar el código QR
     private function validarCodigoQR($codigo)
     {
         // Implementa tu lógica de validación
-        // Por ejemplo, verificar en la base de datos
+        // Por ejemplo, verificar en la base de datos si el código único existe
         return true; // o false según corresponda
     }
-
-    
 
     private function validarPagoSimulado($numeroTarjeta, $cvv, $fechaVencimiento)
     {

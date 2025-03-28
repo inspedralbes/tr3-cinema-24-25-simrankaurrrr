@@ -280,12 +280,13 @@ export default {
   color: #edf2f4;
   min-height: 100vh;
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .content-wrapper {
-  display: flex;
-  gap: 20px;
-  align-items: flex-start;
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -296,16 +297,15 @@ export default {
   padding: 30px;
   border-radius: 12px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  flex-grow: 1;
-  max-width: 800px;
+  width: 100%;
 }
 
 .carrito-container h2 {
   color: #d80032;
   margin-bottom: 20px;
   font-size: 28px;
+  text-align: center;
 }
-
 .back-button {
   background-color: #2b2d42;
   color: #8d99ae;
@@ -316,6 +316,7 @@ export default {
   cursor: pointer;
   transition: all 0.3s ease;
   margin-bottom: 20px;
+  align-self: flex-start;
 }
 
 .back-button:hover {
@@ -366,6 +367,8 @@ export default {
   margin: 10px 0;
   border-radius: 6px;
   width: 100%;
+  box-sizing: border-box;
+  font-size: 16px;
 }
 
 .input-form:focus {
@@ -442,13 +445,83 @@ export default {
   margin-top: 10px;
 }
 
+/* Media Queries para pantallas pequeñas */
 @media (max-width: 768px) {
   .content-wrapper {
-    flex-direction: column;
+    padding: 0 10px;
   }
   
   .carrito-container {
+    padding: 15px;
+  }
+  
+  .carrito-container h2 {
+    font-size: 22px;
+  }
+  
+  .carrito-container li {
+    padding: 15px;
+  }
+  
+  .formulario-pago {
+    padding: 15px;
+  }
+  
+  .input-form {
+    padding: 12px;
+    font-size: 14px;
+  }
+  
+  .btn-eliminar,
+  .btn-pagar-individual,
+  .btn-pagar-todo,
+  .btn-pago {
+    width: 100%;
+    margin: 5px 0;
+    padding: 12px;
+  }
+  
+  .popup-content {
+    width: 90%;
     padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .input-form {
+    padding: 12px 10px;
+    font-size: 16px; /* Tamaño de fuente más grande para mejor legibilidad */
+  }
+  
+  .formulario-pago h3 {
+    font-size: 18px;
+  }
+  
+  .carrito-container p {
+    font-size: 14px;
+  }
+  
+  .back-button {
+    padding: 8px 15px;
+    font-size: 14px;
+  }
+  
+  /* Ajustes específicos para inputs de tarjeta */
+  input[placeholder="Número de Tarjeta"],
+  input[placeholder="MM/YY"],
+  input[placeholder="CVV"] {
+    font-size: 16px;
+    padding: 12px;
+  }
+  
+  /* Mejor espaciado entre elementos en móviles */
+  .carrito-container li {
+    margin-bottom: 15px;
+    padding: 12px;
+  }
+  
+  .formulario-pago {
+    margin-top: 15px;
   }
 }
 </style>

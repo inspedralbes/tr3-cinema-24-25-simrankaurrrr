@@ -1,13 +1,21 @@
 export default defineNuxtConfig({
+  // Configuración de Nitro para prerender
+  nitro: {
+    prerender: {
+      ignore: ['/crud3', '/compra']
+    }
+  },
+  
+  // Configuración runtime (variables de entorno)
   runtimeConfig: {
     public: {
-      apiBase: 'http://127.0.0.1:8000/api', // Base URL de la API
-    },
-    pages: {
-      // Deberías tener una página para comprar entradas
-      'buy-ticket/:id': 'pages/buy-ticket.vue',
-    },
+      apiBase: 'http://mdvd.daw.inspedralbes.cat/back/public/api' // Base URL de la API
+    }
   },
+  
+  // Configuración de CSS global
+  css: [
+    'normalize.css'
+  ],
 
-  compatibilityDate: '2025-03-06',
-});
+})

@@ -92,19 +92,14 @@ onMounted(async () => {
   <button @click="goBack" class="back-link">
       ⬅ Volver
     </button>
-
-  <div v-if="isAdmin" class="p-6">
-    <h1 class="text-2xl font-bold mb-4 text-[#2b2d42]">Consulta Administrativa: Ocupación y Recaptación</h1>
-
-    <!-- Botones CRUD -->
-    <div class="crud-buttons mb-4">
-      <NuxtLink to="crud2" class="crud-button text-white bg-[#ef233c] hover:bg-[#d80032]">
+      <NuxtLink to="crud2" class="crud-link text-white bg-[#ef233c] hover:bg-[#d80032]">
         Administrar Streaming y Sessions
             </NuxtLink>
-      <NuxtLink to="crud3" class="crud-button text-white bg-[#ef233c] hover:bg-[#d80032]">
+      <NuxtLink to="crud3" class="crud-link text-white bg-[#ef233c] hover:bg-[#d80032]">
         Administrar Películas
       </NuxtLink>
-    </div>
+  <div v-if="isAdmin" class="p-6">
+    <h1 class="text-2xl font-bold mb-4 text-[#2b2d42]">Consulta Administrativa: Ocupación y Recaptación</h1> 
 
     <!-- Selector de fecha -->
     <div class="mb-4">
@@ -204,26 +199,23 @@ h1, h2 {
   margin-bottom: 20px;
 }
 
-.crud-buttons {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
 
-.crud-button {
+.crud-link {
+  display: inline-block;
   padding: 10px 20px;
   background-color: #2b2d42;
   color: #edf2f4;
-  border-radius: 4px;
+  border-radius: 8px;
   text-decoration: none;
   font-weight: bold;
+  margin: 10px;
   transition: all 0.3s;
 }
 
-.crud-button:hover {
+.crud-link:hover {
   background-color: #ef233c;
-  transform: translateY(-2px);
 }
+
 
 .input-field {
   background-color: #edf2f4;

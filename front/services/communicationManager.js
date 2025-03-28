@@ -124,22 +124,29 @@ getMovies() {
 },
 
 
-   // Eliminar una película
-   deleteMovie(movieId) {
-    const token = getAuthToken();
-    if (!token) {
-      throw new Error('No se encontró el token de autenticación. Inicia sesión.');
-    }
+deleteMovie(movieId) {
+  const token = getAuthToken();
+  if (!token) {
+    return Promise.reject(new Error('No se encontró el token de autenticación. Inicia sesión.'));
+  }
 
-    return apiClient.delete(`/movies/${movieId}`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-    })
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error al eliminar la película:', error);
-        throw error;
-      });
-  },
+  return apiClient.delete(`/movies/${movieId}`, {
+    headers: { 
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+  })
+  .then(response => {
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Error al eliminar la película');
+    }
+    return response.data;
+  })
+  .catch(error => {
+    console.error('Error en deleteMovie:', error);
+    throw error;
+  });
+},
 // Método para actualizar una película
 updateMovie(movieId, movieData) {
   const token = getAuthToken();
@@ -289,15 +296,7 @@ addSession(movieId, sessionData) {
 },
 
 
-  // Obtener las sesiones de una película (por película, sin la fecha)
-  getSessionsByMovie(movieId) {
-    return apiClient.get(`/sessions/movie/${movieId}`)
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error fetching sessions for movie:', error);
-        throw error;
-      });
-  },
+
 
   // Obtener todos los usuarios
   getUsers() {

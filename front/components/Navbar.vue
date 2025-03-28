@@ -9,6 +9,7 @@
         <NuxtLink to="/" class="nav-link">Home</NuxtLink>
         <NuxtLink to="/buscar" class="nav-link">Buscar</NuxtLink>
         <NuxtLink to="/tusCompras" class="nav-link">Tus compras</NuxtLink>
+
         <!-- Mostrar CRUD solo si el usuario es admin -->
         <NuxtLink v-if="isAdmin" to="/crud1" class="nav-link">Crud</NuxtLink>
       </nav>

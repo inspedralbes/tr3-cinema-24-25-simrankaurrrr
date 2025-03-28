@@ -14,7 +14,7 @@
               <div class="left-side">
                 <h1>{{ movie.title }}</h1>
                 <div class="details">
-                  <p><strong>Duración:</strong> {{ movie.duracion }} min</p>
+                  <p><strong>Duración:</strong> {{ movie.duracion }} </p>
                   <p><strong>Género:</strong> {{ movie.genero }}</p>
                   <p><strong>Año:</strong> {{ movie.año }}</p>
                   <p><strong>Director:</strong> {{ movie.director }}</p>
@@ -482,10 +482,13 @@ onMounted(fetchMovies);
 
 /* ESTILOS PARA THUMBNAILS */
 .thumbnail-container {
+  margin-top: 200px;
   position: absolute;
   bottom: 180px;
   left: 0;
   right: 0;
+  bottom: 120px; /* Cambiado de 180px a 120px */
+
   overflow: hidden;
   padding-left: 38%;
 }
@@ -569,13 +572,14 @@ onMounted(fetchMovies);
 
 .arrows {
   position: absolute;
-  bottom: 250px;
   right: 52%;
   z-index: 100;
   width: 300px;
   max-width: 30%;
   display: flex;
   gap: 10px;
+  bottom: 190px; /* Cambiado de 250px a 190px */
+
   align-items: center;
 }
 

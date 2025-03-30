@@ -2,6 +2,12 @@
 
 ![alt text](image.png)
 
+## 📝 DEMO
+
+![alt text](videoDemo.mp4)
+
+
+
 
 ## 📝 DESCRIPCIÓ BREU
 MDVD Cinemes és una plataforma web moderna que permet als usuaris buscar pel·lícules, comprar entrades i gestionar les seves reserves de forma senzilla. Per als administradors, ofereix eines completes per gestionar la programació, sales i vendes del cinema.

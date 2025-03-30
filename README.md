@@ -4,7 +4,7 @@
 
 ## 📝 DEMO
 
-[![Demo](image.png)](https://youtu.be/zmet-AdSK9w?si=33pcTUKXYA0iDL3c)
+ffmpeg -i videoDemo.mp4 -vf "fps=10,scale=800:-1" videoDemo.gif
 
 
 

@@ -118,19 +118,6 @@ npm run dev
 ## 📄 LICENCIA
 Este proyecto está bajo la licencia MIT. Ver LICENSE para más detalles.
 
-<div align="center"> ✨ Desarrollado por <b>Gursimranjit Kaur</b> ✨ </div> ```
+<div align="center"> ✨ Desarrollado por <b>Gursimranjit Kaur</b> ✨ </div> 
 
-Características destacadas:
-Diseño profesional con badges de tecnologías
 
-Estructura clara y bien organizada
-
-Código formateado para fácil copiado
-
-Responsive (se ve bien en cualquier dispositivo)
-
-Enlaces clickables a todas las herramientas
-
-Estilo moderno 
-
-Secciones diferenciadas visualmente

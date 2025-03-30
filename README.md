@@ -2,7 +2,10 @@
 
 ![alt text](image.png)
 
-## 🔍 Información del Proyecto
+## 📝 DESCRIPCIÓN BREVE
+MDVD Cines es una plataforma web moderna que permite a los usuarios buscar películas, comprar entradas y gestionar sus reservas de forma sencilla. Para los administradores, ofrece herramientas completas para gestionar la programación, salas y ventas del cine.
+
+### 🔍 Información del Proyecto
 
 | 📌 Detalle          | ℹ️ Información |
 |--------------------|---------------|
@@ -13,7 +16,7 @@
 | **Gestor Tareas**  | [https://tree.taiga.io/project/simrankaur-tr3-cinema-simran/timeline] |
 | **Prototipo UI**   | [https://design.penpot.app/#/view?file-id=456eee66-5663-80cb-8005-d35604cdc330] |
 
-## ✨ Características Principales
+#### ✨ Características Principales
 
 <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0;">
   
@@ -34,7 +37,7 @@ Recibe emails de confirmación con los detalles de tus compras
 
 </div>
 
-## 🛠 Stack Tecnológico
+##### 🛠 Stack Tecnológico
 
 <div style="display: flex; justify-content: space-between; margin: 20px 0;">
 
@@ -57,7 +60,7 @@ Recibe emails de confirmación con los detalles de tus compras
 
 </div>
 
-## 🚀 Instalación Local
+####### 🚀 Instalación Local
 
 ### 📋 Requisitos previos
 - Node.js v18+
@@ -113,7 +116,7 @@ npm run dev
 
 ```
 
-#### 📄 LICENCIA
+###### 📄 LICENCIA
 Este proyecto está bajo la licencia MIT. Ver LICENSE para más detalles.
 
 <div align="center"> ✨ Desarrollado por <b>Gursimranjit Kaur</b> ✨ </div> ```

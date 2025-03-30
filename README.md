@@ -1,123 +1,123 @@
-# 🎬 MDVD Cines - Gestión de Entradas de Cine
+# 🎬 MDVD CINEMES 
 
-![alt text](image.png)
+![Banner MDVD Cinemes](https://via.placeholder.com/1200x400?text=MDVD+CINEMES)
 
-## 📝 DESCRIPCIÓN BREVE
-MDVD Cines es una plataforma web moderna que permite a los usuarios buscar películas, comprar entradas y gestionar sus reservas de forma sencilla. Para los administradores, ofrece herramientas completas para gestionar la programación, salas y ventas del cine.
+## 📝 DESCRIPCIÓ BREU
+MDVD Cinemes és una plataforma web moderna que permet als usuaris buscar pel·lícules, comprar entrades i gestionar les seves reserves de forma senzilla. Per als administradors, ofereix eines completes per gestionar la programació, sales i vendes del cinema.
 
-## 🔍 Información del Proyecto
+## 🔍 INFORMACIÓ DEL PROJECTE
 
-| 📌 Detalle          | ℹ️ Información |
+| 📌 Detall          | ℹ️ Informació |
 |--------------------|---------------|
 | **Autora**         | Gursimranjit Kaur |
-| **Estado**         | Completado ✅ |
-| **URL Producción** | [http://mdvdcine.daw.inspedralbes.cat/] |
-| **URL Prod  Back** | [http://mdvdback.daw.inspedralbes.cat/] |
-| **Gestor Tareas**  | [https://tree.taiga.io/project/simrankaur-tr3-cinema-simran/timeline] |
-| **Prototipo UI**   | [https://design.penpot.app/#/view?file-id=456eee66-5663-80cb-8005-d35604cdc330] |
+| **Estat**          | Completat ✅ |
+| **URL Producció**  | [http://mdvdcine.daw.inspedralbes.cat/](http://mdvdcine.daw.inspedralbes.cat/) |
+| **URL Backend**    | [http://mdvdback.daw.inspedralbes.cat/](http://mdvdback.daw.inspedralbes.cat/) |
+| **Gestor Tasques** | [Taiga](https://tree.taiga.io/project/simrankaur-tr3-cinema-simran/timeline) |
+| **Prototip UI**    | [Penpot](https://design.penpot.app/#/view?file-id=456eee66-5663-80cb-8005-d35604cdc330) |
 
-## ✨ Características Principales
+## ✨ CARACTERÍSTIQUES PRINCIPALS
 
-<div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0;">
-  
-🔍 **Búsqueda avanzada**  
-Filtra películas por género, idioma o año con nuestro sistema inteligente
+<div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
 
-🛒 **Compra integrada**  
-Sistema completo de reserva y compra de entradas con confirmación inmediata
+🔍 **Cerca avançada**  
+Filtra pel·lícules per gènere, idioma o any amb el nostre sistema intel·ligent
 
-📊 **Gestión de reservas**  
-Consulta tu historial y gestiona tus próximas visitas al cine
+🎟 **Compra integrada**  
+Sistema complet de reserva i compra d'entrades amb confirmació immediata
 
-👨‍💼 **Panel administrativo**  
-Herramientas completas para la gestión del cine y programación
+📅 **Gestió de reserves**  
+Consulta el teu historial i gestiona les teves properes visites al cinema
 
-✉️ **Notificaciones**  
-Recibe emails de confirmación con los detalles de tus compras
+👨‍💼 **Panell d'administració**  
+Eines completes per a la gestió del cinema i programació
+
+✉️ **Notificacions**  
+Rep correus de confirmació amb els detalls de les teves compres
 
 </div>
 
-## 🛠 Stack Tecnológico
+## 🛠 TECNOLOGIES UTILITZADES
 
 <div style="display: flex; justify-content: space-between; margin: 20px 0;">
 
-<div style="width: 48%; background: #f0f8ff; padding: 15px; border-radius: 10px;">
+<div style="width: 48%; background: #f0f8ff; padding: 15px; border-radius: 8px;">
 
 ### **Frontend**
 - Nuxt.js (Vue 3)
-- Axios (API calls)
+- Axios (crides API)
+- Tailwind CSS
 
 </div>
 
-<div style="width: 48%; background: #fff0f5; padding: 15px; border-radius: 10px;">
+<div style="width: 48%; background: #fff0f5; padding: 15px; border-radius: 8px;">
 
 ### **Backend**
 - Laravel 10
-- MySQL Database
+- MySQL
 - Laravel Mail
 
 </div>
 
 </div>
 
-## 🚀 Instalación Local
+## 🚀 INSTAL·LACIÓ LOCAL
 
-### 📋 Requisitos previos
+### 📋 REQUISITS PREVIS
 - Node.js v18+
 - PHP 8.1+
 - Composer
 - MySQL 5.7+
 
-### 🔧 Configuración Backend
+### 🔧 CONFIGURACIÓ BACKEND
 
 ```bash
-# Clonar repositorio
+# Clonar el repositori
 git clone [URL_DEL_REPO]
 
-# Acceder a directorio backend
+# Accedir al directori backend
 cd back
 
-# Instalar dependencias
+# Instal·lar dependències
 composer install
 
-# Configurar entorno
+# Configurar entorn
 cp .env.example .env
 
-# Generar clave de aplicación
+# Generar clau de l'aplicació
 php artisan key:generate
 
-# Configurar base de datos (editar .env)
+# Configurar base de dades (editar .env)
 DB_DATABASE=mdvd_cines
-DB_USERNAME=tu_usuario
-DB_PASSWORD=tu_contraseña
+DB_USERNAME=el_teu_usuari
+DB_PASSWORD=la_teva_contrasenya
 
-# Ejecutar migraciones
+# Executar migracions
 php artisan migrate --seed
 
 # Iniciar servidor
 php artisan serve
 ```
 
-### 🔧 Configuración Frontend
+### 🔧 Configuració Frontend
 
 ```bash
-# Acceder al directorio frontend
+# Accedir al directori frontend
 cd ../front
 
-# Instalar dependencias
+# Instal·lar dependències
 npm install
 npm install normalize.css
 
-# Configurar conexión API (editar nuxt.config.ts)
+# Configurar connexió API (editar nuxt.config.ts)
 apiBase: "http://localhost:8000/api"
 
-# Iniciar aplicación
+# Iniciar aplicació
 npm run dev
 
 ```
-## 📄 LICENCIA
-Este proyecto está bajo la licencia MIT. Ver LICENSE para más detalles.
+## 📄 LICÈNCIA
+Aquest projecte està sota la llicència MIT. Veure LICENSE per a més detalls.
 
-<div align="center"> ✨ Desarrollado por <b>Gursimranjit Kaur</b> ✨ </div> 
-
+<div align="center"> ✨ Desenvolupat per <b>Gursimranjit Kaur</b> ✨ </div> 
 

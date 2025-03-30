@@ -1,6 +1,7 @@
 # 🎬 MDVD CINEMES 
 
-![Banner MDVD Cinemes](https://via.placeholder.com/1200x400?text=MDVD+CINEMES)
+![alt text](image.png)
+
 
 ## 📝 DESCRIPCIÓ BREU
 MDVD Cinemes és una plataforma web moderna que permet als usuaris buscar pel·lícules, comprar entrades i gestionar les seves reserves de forma senzilla. Per als administradors, ofereix eines completes per gestionar la programació, sales i vendes del cinema.

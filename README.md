@@ -10,7 +10,7 @@
 | **Estado**         | Completado ✅ |
 | **URL Producción** | [http://mdvdcine.daw.inspedralbes.cat/] |
 | **URL Prod  Back** | [http://mdvdback.daw.inspedralbes.cat/] |
-| **Gestor Tareas**  | [btree.taiga.io/project/simrankaur-tr3-cinema-simran/timeline] |
+| **Gestor Tareas**  | [https://tree.taiga.io/project/simrankaur-tr3-cinema-simran/timeline] |
 | **Prototipo UI**   | [https://design.penpot.app/#/view?file-id=456eee66-5663-80cb-8005-d35604cdc330] |
 
 ## ✨ Características Principales

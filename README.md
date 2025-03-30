@@ -4,8 +4,7 @@
 
 ## 📝 DEMO
 
-![alt text](videoDemo.mp4)
-
+[![Demo](image.png)](https://youtu.be/zmet-AdSK9w?si=33pcTUKXYA0iDL3c)
 
 
 

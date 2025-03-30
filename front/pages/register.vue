@@ -69,7 +69,6 @@ import communicationManager from '../services/communicationManager'; // Asegúra
 
 const router = useRouter();
 
-// Estado para el formulario de registro
 const registerData = ref({
   name: '',
   email: '',
@@ -80,19 +79,15 @@ const registerData = ref({
   role: 'user',
 });
 
-// Estado para el formulario de login
 const loginData = ref({
   email: '',
   password: '',
 });
 
-// Estado para manejar el panel activo (registro o login)
 const isRegisterActive = ref(false);
 
-// Estado para manejar errores
 const error = ref('');
 
-// Función para alternar entre registro y login
 const toggleRegister = (active) => {
   isRegisterActive.value = active;
 };
@@ -101,21 +96,16 @@ const handleRegister = async () => {
   try {
     console.log("Datos de registro a enviar:", registerData.value);
 
-    // Realizar la solicitud de registro
     const response = await communicationManager.registerUser(registerData.value);
 
-    // Depuración: Mostrar la respuesta del servidor
     console.log("Respuesta del servidor:", response);
 
-    // Verificar si la respuesta es exitosa
     if (response && response.message === "User registered successfully") {
-      // Redirigir al home después del registro
       router.push('/');
     } else {
       throw new Error('Registration failed: Respuesta inesperada del servidor');
     }
   } catch (err) {
-    // Manejar errores
     error.value = err.message || 'Registration failed. Please try again.';
     console.error("Error durante el registro:", err);
   }
@@ -125,15 +115,12 @@ const handleLogin = async () => {
   try {
     const response = await communicationManager.loginUser(loginData.value);
     
-    // Verificar si la respuesta es exitosa
     if (response && response.auth_token) {
-      // Redirigir al home después del login
       router.push('/');
     } else {
       throw new Error('Invalid credentials');
     }
   } catch (err) {
-    // Manejar errores específicos
     if (err.response && err.response.status === 401) {
       error.value = 'Correo electrónico o contraseña incorrectos';
     } else {
@@ -176,7 +163,7 @@ const handleLogin = async () => {
 }
 form {
   width: 100%;
-  max-width: 320px; /* Ancho máximo para el formulario */
+  max-width: 320px;
 }
 
 .sign-in-container {
@@ -305,14 +292,13 @@ input, select {
   font-size: 14px;
   color: #2b2d42;
   height: 42px;
-  font-family: inherit; /* Asegura misma fuente */
-  box-sizing: border-box; /* Modelo de caja consistente */
+  font-family: inherit;
+  box-sizing: border-box; 
 }
 input:focus, select:focus {
   border-color: #ef233c;
   outline: none;
 }
-/* Estilo para el input de fecha para que coincida */
 input[type="date"] {
   appearance: none;
   -webkit-appearance: none;
@@ -325,27 +311,24 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   opacity: 0.7;
   cursor: pointer;
 }
-/* Estilo para el hover/focus */
 select:hover, 
 select:focus {
   border-color: #ef233c;
   outline: none;
 }
 
-/* Estilo específico para el select para igualarlo completamente */
 select {
-  appearance: none; /* Elimina el estilo nativo del navegador */
-  -webkit-appearance: none; /* Para Safari */
-  -moz-appearance: none; /* Para Firefox */
+  appearance: none; 
+  -webkit-appearance: none; 
+  -moz-appearance: none; 
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232b2d42'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 12px center;
   background-size: 12px;
-  padding-right: 32px; /* Espacio para la flecha */
-  cursor: pointer; /* Cambia el cursor para indicar que es seleccionable */
+  padding-right: 32px; 
+  cursor: pointer; 
 }
 
-/* Estilo para las opciones */
 select option {
   background-color: #edf2f4;
   color: #2b2d42;
@@ -396,7 +379,6 @@ button.ghost:hover {
   font-weight: bold;
   margin-top: 10px;
 }
-/* Mejoramos el responsive */
 @media (max-width: 1024px) {
   .form-container {
     width: 45%;

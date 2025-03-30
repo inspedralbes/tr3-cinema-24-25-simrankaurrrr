@@ -9,10 +9,7 @@ class MovieSession extends Model
 {
     use HasFactory;
 
-    // Tabla asociada al modelo
     protected $table = 'movie_sessions';
-
-    // Campos que pueden ser asignados masivamente
     protected $fillable = [
         'movie_id',
         'session_time',
@@ -23,13 +20,11 @@ class MovieSession extends Model
     {
         return $this->hasMany(Reserva::class);
     }
-    // Relación con la tabla 'movies'
     public function movie()
     {
         return $this->belongsTo(Movie::class);
     }
 
-    // Relación con la tabla 'butacas'
     public function butacas()
     {
         return $this->hasMany(Butaca::class);

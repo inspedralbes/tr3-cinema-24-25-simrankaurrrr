@@ -159,7 +159,6 @@ export default {
     },
     
     limpiarFormularioPago() {
-      // Limpiar formulario de pago general
       this.datosPago = {
         numero_tarjeta: '',
         fecha_vencimiento: '',
@@ -169,7 +168,6 @@ export default {
         email: '',
       };
       
-      // Limpiar formularios individuales
       this.carrito.forEach(reserva => {
         reserva.datosPago = {
           numero_tarjeta: '',

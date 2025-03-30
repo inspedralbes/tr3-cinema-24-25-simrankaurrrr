@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Mail\HelloMail;
-use Illuminate\Support\Facades\Mail;  // Aquí importamos Mail
+use Illuminate\Support\Facades\Mail;  
 
 class EmailController extends Controller
 {

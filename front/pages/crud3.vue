@@ -195,11 +195,10 @@ export default {
         disponible_en_streaming: false,
       },
       imageUrl: '',
-      // Nuevas propiedades para las alertas
       showAlert: false,
       alertMessage: '',
-      alertType: 'success' // 'success', 'error' o 'confirm'
-    };
+      alertType: 'success' 
+     };
   },
   methods: {
     async uploadTrailer(event) {
@@ -314,18 +313,15 @@ export default {
 
     async deleteMovie(id) {
       try {
-        // Mostrar alerta de confirmación
         const confirmed = await this.showConfirmDialog(
           '¿Estás seguro de que deseas eliminar esta película?'
         );
 
         if (!confirmed) return;
 
-        // Proceder con la eliminación
         await communicationManager.deleteMovie(id);
         this.movies = this.movies.filter((movie) => movie.id !== id);
 
-        // Mostrar mensaje de éxito
         this.showAlertMessage('Película eliminada correctamente', 'success');
 
       } catch (error) {
@@ -341,19 +337,16 @@ export default {
       }
     },
 
-    // Nuevo método para mostrar diálogos de confirmación
     showConfirmDialog(message) {
       return new Promise((resolve) => {
         this.alertMessage = message;
         this.alertType = 'confirm';
         this.showAlert = true;
 
-        // Guardamos la función resolve para usarla cuando el usuario responda
         this.confirmResolve = resolve;
       });
     },
 
-    // Método para mostrar mensajes simples
     showAlertMessage(message, type = 'success') {
       this.alertMessage = message;
       this.alertType = type;
@@ -366,7 +359,6 @@ export default {
       }
     },
 
-    // Método modificado para manejar la respuesta
     confirmAlert(confirmed) {
       if (this.confirmResolve) {
         this.confirmResolve(confirmed);
@@ -449,8 +441,6 @@ export default {
 .crud-link:hover {
   background-color: #ef233c;
 }
-
-/* Lista de películas */
 .movie-list {
   width: 100%;
 }
@@ -619,7 +609,6 @@ export default {
   color: #2b2d42;
 }
 
-/* Alertas */
 .custom-alert {
   position: fixed;
   top: 20px;
@@ -634,7 +623,6 @@ export default {
   max-width: calc(100% - 30px);
 }
 
-/* Media queries para móviles */
 @media (max-width: 768px) {
   .mobile-hidden {
     display: none;

@@ -101,7 +101,7 @@ public function getOcupacionByDate($movie_id, $session_date)
     $ocupacion = $sessions->map(function($session) {
         return [
             'session_id' => $session->id,
-            'ocupacion' => $session->butacas->count() // Ajusta según cómo manejes las butacas y reservas
+            'ocupacion' => $session->butacas->count() 
         ];
     });
 
@@ -112,7 +112,7 @@ public function getOcupacionByDate($movie_id, $session_date)
     {
         // Busca las sesiones donde la fecha de la sesión coincide con la fecha proporcionada
         $sessions = MovieSession::where('movie_id', $movie_id)
-                                ->whereDate('session_date', $session_date) // Aquí usamos whereDate para comparar solo la fecha
+                                ->whereDate('session_date', $session_date) 
                                 ->get();
     
         if ($sessions->isEmpty()) {
@@ -140,7 +140,6 @@ public function getOcupacionByDate($movie_id, $session_date)
     }
     public function store(Request $request, $movie_id)
 {
-    // Asegúrate de que el parámetro $movie_id esté siendo pasado correctamente
     if (!$movie_id) {
         return response()->json(['error' => 'No se proporcionó el ID de la película'], 400);
     }
@@ -148,7 +147,6 @@ public function getOcupacionByDate($movie_id, $session_date)
     // Buscar la película por el ID
     $movie = Movie::find($movie_id);
 
-    // Verificar si la película existe y si está disponible en streaming
     if (!$movie) {
         return response()->json(['error' => 'Película no encontrada'], 404);
     }
@@ -159,10 +157,10 @@ public function getOcupacionByDate($movie_id, $session_date)
 
     // Lógica de validación de la sesión
     $validated = $request->validate([
-        'session_date' => 'required|date|after:today', // Asegúrate de que la fecha sea válida y posterior a hoy
-        'session_time' => 'required|date_format:H:i:s|in:16:00:00,18:00:00,20:00:00', // Asegúrate de que sea uno de los horarios válidos
+        'session_date' => 'required|date|after:today', 
+        'session_time' => 'required|date_format:H:i:s|in:16:00:00,18:00:00,20:00:00', 
         'dia_espectador' => 'boolean',
-        'visible_para_usuarios' => 'boolean', // Otras validaciones si las necesitas
+        'visible_para_usuarios' => 'boolean', 
     ]);
 
     // Comprobar si ya existe una sesión para la misma película, fecha y hora
@@ -181,7 +179,7 @@ public function getOcupacionByDate($movie_id, $session_date)
         'session_date' => $validated['session_date'],
         'session_time' => $validated['session_time'],
         'dia_espectador' => $request->dia_espectador ?? false,
-        'visible_para_usuarios' => $request->visible_para_usuarios ?? true, // Valor por defecto si no está proporcionado
+        'visible_para_usuarios' => $request->visible_para_usuarios ?? true, 
     ]);
 
     // Responder con la sesión creada
@@ -209,11 +207,11 @@ public function getOcupacionByDate($movie_id, $session_date)
         // Validación de datos
         $request->validate([
             'movie_id' => 'exists:movies,id',
-            'session_time' => 'in:16:00:00,18:00:00,20:00:00', // Validar que la hora esté en las opciones válidas
+            'session_time' => 'in:16:00:00,18:00:00,20:00:00', 
             'session_date' => 'date',
             'dia_espectador' => 'boolean',
         ], [
-            'session_time.in' => 'La hora de la sesión debe ser 16:00:00, 18:00:00 o 20:00:00.' // Mensaje personalizado para hora inválida
+            'session_time.in' => 'La hora de la sesión debe ser 16:00:00, 18:00:00 o 20:00:00.' 
         ]);
 
         $session->update($request->only(['movie_id', 'session_time', 'session_date', 'dia_espectador']));

@@ -90,7 +90,6 @@
 
 
 <script setup>
-// Lógica de Vue
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import communicationManager from '../../services/communicationManager';
@@ -108,15 +107,13 @@ const selectedDate = ref('');
 const selectedSeats = ref([]);
 const compra_id = ref(null);
 const showLogin = ref(false);
-const alertMessage = ref(null);  // Controla el mensaje de alerta
-
+const alertMessage = ref(null);  
 const isUserLoggedIn = computed(() => {
   const token = localStorage.getItem('auth_token');
   return !!token;
 });
-// Añadir este método en el script setup
 function goBack() {
-  router.go(-1); // Navega a la página anterior
+  router.go(-1); 
 }
 function showLoginPopup() {
   showLogin.value = true;
@@ -131,10 +128,9 @@ function redirectToLogin() {
 }
 
 function closeAlert() {
-  alertMessage.value = null;  // Cierra la alerta
+  alertMessage.value = null;  
 }
 async function reservarAsientos() {
-  // Verificación inicial del límite
   if (selectedSeats.value.length > 10) {
     alertMessage.value = '❌ Límite alcanzado: No puedes reservar más de 10 butacas por transacción';
     return;
@@ -176,9 +172,7 @@ async function reservarAsientos() {
   } catch (error) {
     console.error('Error reservando las butacas:', error);
     
-    // Manejo específico del error 400
     if (error.response && error.response.status === 400) {
-      // Usamos el mensaje del backend si está disponible
       alertMessage.value = error.response.data?.message || 
                          'No puedes reservar más de 10 butacas para esta sesión';
     } else {
@@ -303,7 +297,7 @@ onMounted(() => {
 .movie-poster {
   max-width: 100%;
   height: auto;
-  max-height: 450px; /* Ajusta este valor según necesites */
+  max-height: 450px; 
   object-fit: contain;
   border-radius: 8px;
   margin: 15px 0;

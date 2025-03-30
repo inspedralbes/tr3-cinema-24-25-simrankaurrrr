@@ -57,7 +57,7 @@ class HelloMail extends Mailable
         with: [
             'nombre' => $this->nombre,
             'apellido' => $this->apellido,
-            'pdfPath' => $this->pdfPath, // Pasar la ruta del PDF a la vista
+            'pdfPath' => $this->pdfPath,
         ]
     );
 }
@@ -72,7 +72,6 @@ class HelloMail extends Mailable
 
         $pdf = Pdf::loadView('pdf.confirmacion', $data);
 
-        // Guardar el PDF temporalmente en storage
         $pdfPath = storage_path('app/public/download.pdf');
         $pdf->save($pdfPath);
 

@@ -22,10 +22,10 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'phone' => $request->phone, // Añadido
-            'address' => $request->address, // Añadido
-            'birthdate' => $request->birthdate, // Añadido
-            'role' => $request->role, // Añadido
+            'phone' => $request->phone, 
+            'address' => $request->address, 
+            'birthdate' => $request->birthdate, 
+            'role' => $request->role,
         ]);
         
 
@@ -80,11 +80,9 @@ class UserController extends Controller
         $user = Auth::user();
 
         if ($user) {
-            // Eliminar el token almacenado en la base de datos
             $user->auth_token = null;
             $user->save();
 
-            // Revocar todos los tokens de Sanctum del usuario
             $user->tokens()->delete();
 
             return response()->json(['message' => 'Logout successful']);
@@ -96,10 +94,9 @@ class UserController extends Controller
        // Obtener todos los usuarios
        public function index()
        {
-           // Verificar si el usuario autenticado es admin
            $user = Auth::user();
            if ($user->role !== 'admin') {
-               return response()->json(['message' => 'Unauthorized'], 403); // Si no es admin, return 403
+               return response()->json(['message' => 'Unauthorized'], 403); 
            }
    
            $users = User::all();
@@ -109,10 +106,9 @@ class UserController extends Controller
        // Obtener un usuario por ID
        public function show($id)
        {
-           // Verificar si el usuario autenticado es admin
            $user = Auth::user();
            if ($user->role !== 'admin') {
-               return response()->json(['message' => 'Unauthorized'], 403); // Si no es admin, return 403
+               return response()->json(['message' => 'Unauthorized'], 403); 
            }
    
            $user = User::find($id);
@@ -128,20 +124,19 @@ class UserController extends Controller
 {
     return response()->json($request->user());
 }
+
 // Obtener el rol del usuario basado en el token
 public function getUserRole(Request $request)
 {
-    // Obtener el usuario autenticado
+
     $user = Auth::user();
 
     if ($user) {
-        // Retornar el rol del usuario
+
         return response()->json([
             'role' => $user->role,
         ]);
     }
-
-    // Si no hay usuario autenticado, retornar un error
     return response()->json(['message' => 'Unauthorized'], 401);
 }
 }

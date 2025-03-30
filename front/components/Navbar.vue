@@ -255,7 +255,6 @@ onMounted(() => {
 
 @media (max-width: 480px) {
 
-  /* Cambiar el layout de los enlaces de navegación en pantallas pequeñas */
   .nav-links {
     width: 80%;
     display: flex;
@@ -263,20 +262,17 @@ onMounted(() => {
     justify-content: space-between;
   }
 
-  /* Modificar el layout de los botones en pantallas pequeñas */
 
   .button {
     width: 60%;
     max-width: 100px;
   }
 
-  /* Para pantallas muy pequeñas (por ejemplo, móviles en modo vertical) */
   .header-container {
     flex-direction: column;
     gap: 15px;
   }
 
-  /* Organizar los botones en una fila separada */
   .button-container {
     width: 50%;
     display: flex;

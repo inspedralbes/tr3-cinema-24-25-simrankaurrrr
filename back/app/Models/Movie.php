@@ -11,7 +11,6 @@ class Movie extends Model
 
     protected $table = 'movies';
 
-     // Definir los campos que se pueden asignar masivamente
      protected $fillable = [
         'title',
         'sinopsis',

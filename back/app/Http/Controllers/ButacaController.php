@@ -8,7 +8,7 @@ use App\Models\Reserva;
 use App\Models\MovieSession;
 use App\Models\User;
 use App\Models\Compra;
-use App\Models\Pagos; // Asegúrate de importar el modelo de Pagos
+use App\Models\Pagos; 
 use Illuminate\Http\Request;
 
 class ButacaController extends Controller
@@ -91,7 +91,7 @@ class ButacaController extends Controller
         $compra->user_id = $user->id;
         $compra->movie_session_id = $request->movie_session_id;
         $compra->ticket_quantity = 1;
-        $compra->total_amount = $butaca->precio; // Precio dinámico
+        $compra->total_amount = $butaca->precio; 
         $compra->estado = 'en_proceso';
         $compra->butaca_ids = json_encode([$butaca_id]);
         $compra->save();
@@ -102,7 +102,7 @@ class ButacaController extends Controller
         $reserva->user_id = $user->id;
         $reserva->movie_session_id = $request->movie_session_id;
         $reserva->butaca_ids = json_encode([$butaca_id]);
-        $reserva->estado = 'en_proceso'; // Cambiado de 'procesando' a 'en_proceso' para coherencia
+        $reserva->estado = 'en_proceso'; 
         $reserva->precio = $butaca->precio;
         $reserva->save();
     }
@@ -151,7 +151,7 @@ public function confirmarCompra(Request $request)
                     }
 
                     // Eliminar la reserva porque ya fue pagada
-                    $reserva->estado = 'pagada'; // Para mantener el registro en la base de datos
+                    $reserva->estado = 'pagada';
                     $reserva->save();
                 }
             }
@@ -169,25 +169,24 @@ public function confirmarCompra(Request $request)
     // Función para simular la validación del pago
     private function validarPagoSimulado($numeroTarjeta, $cvv, $fechaVencimiento)
     {
-        // Simulación de validación de tarjeta (puedes mejorar esta lógica según tus necesidades)
         if (strlen($numeroTarjeta) == 16 && strlen($cvv) == 3 && $this->validarFechaVencimiento($fechaVencimiento)) {
-            return true;  // Pago simulado exitoso
+            return true;  
         }
         
-        return false; // Pago fallido
+        return false; 
     }
 
     // Validar la fecha de vencimiento
     private function validarFechaVencimiento($fechaVencimiento)
     {
-        $currentDate = date('m/y'); // Fecha actual en formato mes/año
-        return $fechaVencimiento >= $currentDate;  // Asegurarse de que la fecha no haya expirado
+        $currentDate = date('m/y');
+        return $fechaVencimiento >= $currentDate;  
     }
 
     // Función auxiliar para determinar si es "Día del Espectador"
     private function esDiaEspectador($fecha)
     {
-        $diasEspectador = ['Wednesday']; // Puedes modificarlo según las reglas de negocio
+        $diasEspectador = ['Wednesday']; 
         return in_array(date('l', strtotime($fecha)), $diasEspectador);
     }
 
@@ -208,14 +207,14 @@ public function confirmarCompra(Request $request)
         // Si la reserva existe, devolver el estado y el ID del usuario
         if ($reserva) {
             return response()->json([
-                'estado' => $reserva->estado, // Ahora se obtiene el estado de la reserva (reservada, confirmada, etc.)
+                'estado' => $reserva->estado,
                 'butaca_id' => $butaca_id,
                 'session_id' => $session_id,
-                'user_id' => $reserva->user_id, // ID del usuario que hizo la reserva
+                'user_id' => $reserva->user_id,
             ], 200);
         } else {
             return response()->json([
-                'estado' => 'disponible', // Si no está reservada, el estado es 'disponible'
+                'estado' => 'disponible', 
                 'butaca_id' => $butaca_id,
                 'session_id' => $session_id,
             ], 200);
@@ -232,8 +231,8 @@ public function confirmarCompra(Request $request)
     
         // Obtener todas las reservas en estado "en_proceso" o "procesando" del usuario
         $reservas = Reserva::where('user_id', $user->id)
-                            ->whereIn('estado', ['en_proceso', 'procesando']) // Incluir ambos estados
-                            ->with(['butaca', 'movieSession.movie']) // Cargar relaciones
+                            ->whereIn('estado', ['en_proceso', 'procesando'])
+                            ->with(['butaca', 'movieSession.movie'])
                             ->get();
     
         $carrito = [];
@@ -293,14 +292,14 @@ public function verEstadoSesion($session_id)
         // Buscar si la butaca está en una reserva "en_proceso"
         $reserva = $reservas->firstWhere('butaca_ids', 'like', '%"'.$butaca->id.'"%');
         if ($reserva && $reserva->estado === 'en_proceso') {
-            $estado = 'reservado';  // Butaca reservada pero no pagada
+            $estado = 'reservado';
         }
 
         // Buscar si la butaca ya fue comprada y pagada
         foreach ($compras as $compra) {
             $butaca_ids = json_decode($compra->butaca_ids, true);
             if (in_array($butaca->id, $butaca_ids) && $compra->estado === 'pagado') {
-                $estado = 'comprado';  // Butaca ya comprada y pagada
+                $estado = 'comprado'; 
                 break;
             }
         }
@@ -322,8 +321,8 @@ public function verEstadoSesion($session_id)
 public function obtenerResumenSesion(Request $request)
 {
     // Obtener los parámetros de fecha y hora
-    $sessionDate = $request->query('session_date');  // Fecha de la sesión (ej. 2025-03-19)
-    $sessionTime = $request->query('session_time');  // Hora de la sesión (ej. 16:00:00)
+    $sessionDate = $request->query('session_date');  
+    $sessionTime = $request->query('session_time');
 
     // Buscar la sesión de la película
     $movieSession = MovieSession::whereDate('session_date', $sessionDate)

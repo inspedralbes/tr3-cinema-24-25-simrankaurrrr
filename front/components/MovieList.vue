@@ -67,7 +67,7 @@
 
 <script setup lang="ts">import { ref, onMounted, computed, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
-import { jsPDF } from "jspdf";  // Añade esto al inicio con los otros imports
+import { jsPDF } from "jspdf";  
 
 const config = useRuntimeConfig();
 const movies = ref<any[]>([]);

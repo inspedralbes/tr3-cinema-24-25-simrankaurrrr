@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('movie_sessions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('movie_id')->constrained()->onDelete('cascade');
-            $table->time('session_time'); // Hora de la sesión (16:00, 18:00, 20:00)
-            $table->date('session_date'); // Fecha de la sesión
-            $table->boolean('dia_espectador')->default(false); // Si es un día de espectador
+            $table->time('session_time'); 
+            $table->date('session_date'); 
+            $table->boolean('dia_espectador')->default(false); 
             $table->timestamps();
         });
     }

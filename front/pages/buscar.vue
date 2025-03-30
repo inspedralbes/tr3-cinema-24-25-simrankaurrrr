@@ -98,146 +98,137 @@
 </template>
 
   
-  <script>
-  import { ref, onMounted, computed } from 'vue';
-  import communicationManager from '@/services/communicationManager';
-  import Navbar from '@/components/Navbar.vue';
-  import { useRoute, useRouter } from 'vue-router';
+<script>
+import { ref, onMounted, computed } from 'vue';
+import communicationManager from '@/services/communicationManager';
+import Navbar from '@/components/Navbar.vue';
+import { useRoute, useRouter } from 'vue-router';
 
-  export default {
-    components: {
-      Navbar
-    },
-    setup() {
-      const router = useRouter();
-      
-      // Datos reactivos
-      const allMovies = ref([]);
-      const loading = ref(true);
-      const searchQuery = ref('');
-      const selectedGenre = ref('');
-      const selectedYear = ref('');
-      const selectedLanguage = ref('');
-      const selectedFormat = ref('');
-      const onlyStreaming = ref(false);
-      
-      // Obtener valores únicos para los filtros
-      const genres = computed(() => {
-        const uniqueGenres = new Set();
-        allMovies.value.forEach(movie => {
-          if (movie.genero) uniqueGenres.add(movie.genero);
-        });
-        return Array.from(uniqueGenres).sort();
+export default {
+  components: {
+    Navbar
+  },
+  setup() {
+    const router = useRouter();
+    const allMovies = ref([]);
+    const loading = ref(true);
+    const searchQuery = ref('');
+    const selectedGenre = ref('');
+    const selectedYear = ref('');
+    const selectedLanguage = ref('');
+    const selectedFormat = ref('');
+    const onlyStreaming = ref(false);
+
+    const genres = computed(() => {
+      const uniqueGenres = new Set();
+      allMovies.value.forEach(movie => {
+        if (movie.genero) uniqueGenres.add(movie.genero);
       });
-      
-      const years = computed(() => {
-        const uniqueYears = new Set();
-        allMovies.value.forEach(movie => {
-          if (movie.año) uniqueYears.add(movie.año);
-        });
-        return Array.from(uniqueYears).sort((a, b) => b - a);
+      return Array.from(uniqueGenres).sort();
+    });
+
+    const years = computed(() => {
+      const uniqueYears = new Set();
+      allMovies.value.forEach(movie => {
+        if (movie.año) uniqueYears.add(movie.año);
       });
-      
-      const languages = computed(() => {
-        const uniqueLangs = new Set();
-        allMovies.value.forEach(movie => {
-          if (movie.idioma) uniqueLangs.add(movie.idioma);
-        });
-        return Array.from(uniqueLangs).sort();
+      return Array.from(uniqueYears).sort((a, b) => b - a);
+    });
+
+    const languages = computed(() => {
+      const uniqueLangs = new Set();
+      allMovies.value.forEach(movie => {
+        if (movie.idioma) uniqueLangs.add(movie.idioma);
       });
-      
-      const formats = computed(() => {
-        const uniqueFormats = new Set();
-        allMovies.value.forEach(movie => {
-          if (movie.formato) uniqueFormats.add(movie.formato);
-        });
-        return Array.from(uniqueFormats).sort();
+      return Array.from(uniqueLangs).sort();
+    });
+
+    const formats = computed(() => {
+      const uniqueFormats = new Set();
+      allMovies.value.forEach(movie => {
+        if (movie.formato) uniqueFormats.add(movie.formato);
       });
-      
-      // Películas filtradas
-      const filteredMovies = computed(() => {
-        return allMovies.value.filter(movie => {
-          // Filtro por texto de búsqueda
-          const searchText = searchQuery.value.toLowerCase();
-          const matchesSearch = 
-            !searchText ||
-            movie.title.toLowerCase().includes(searchText) ||
-            movie.director.toLowerCase().includes(searchText) ||
-            (movie.actores && movie.actores.toLowerCase().includes(searchText)) ||
-            (movie.sinopsis && movie.sinopsis.toLowerCase().includes(searchText));
-          
-          // Filtros adicionales
-          const matchesGenre = !selectedGenre.value || movie.genero === selectedGenre.value;
-          const matchesYear = !selectedYear.value || movie.año == selectedYear.value;
-          const matchesLanguage = !selectedLanguage.value || movie.idioma === selectedLanguage.value;
-          const matchesFormat = !selectedFormat.value || movie.formato === selectedFormat.value;
-          const matchesStreaming = !onlyStreaming.value || movie.disponible_en_streaming;
-          
-          return matchesSearch && matchesGenre && matchesYear && 
-                 matchesLanguage && matchesFormat && matchesStreaming;
-        });
+      return Array.from(uniqueFormats).sort();
+    });
+
+    const filteredMovies = computed(() => {
+      return allMovies.value.filter(movie => {
+        const searchText = searchQuery.value.toLowerCase();
+        const matchesSearch = 
+          !searchText ||
+          movie.title.toLowerCase().includes(searchText) ||
+          movie.director.toLowerCase().includes(searchText) ||
+          (movie.actores && movie.actores.toLowerCase().includes(searchText)) ||
+          (movie.sinopsis && movie.sinopsis.toLowerCase().includes(searchText));
+
+        const matchesGenre = !selectedGenre.value || movie.genero === selectedGenre.value;
+        const matchesYear = !selectedYear.value || movie.año == selectedYear.value;
+        const matchesLanguage = !selectedLanguage.value || movie.idioma === selectedLanguage.value;
+        const matchesFormat = !selectedFormat.value || movie.formato === selectedFormat.value;
+        const matchesStreaming = !onlyStreaming.value || movie.disponible_en_streaming;
+
+        return matchesSearch && matchesGenre && matchesYear && 
+               matchesLanguage && matchesFormat && matchesStreaming;
       });
-      
-      // Métodos
-      const fetchMovies = async () => {
-        try {
-          loading.value = true;
-          const movies = await communicationManager.getAllMovies();
-          allMovies.value = movies;
-        } catch (error) {
-          console.error('Error al cargar películas:', error);
-          // Aquí podrías mostrar un mensaje de error al usuario
-        } finally {
-          loading.value = false;
-        }
-      };
-      
-      const searchMovies = () => {
-        // La computada filteredMovies se actualiza automáticamente
-        console.log('Buscando películas con filtros:', {
-          searchQuery: searchQuery.value,
-          genre: selectedGenre.value,
-          year: selectedYear.value,
-          language: selectedLanguage.value,
-          format: selectedFormat.value,
-          streaming: onlyStreaming.value
-        });
-      };
-      
-      const goToMovie = (movieId) => {
-        router.push(`/movies/${movieId}`);
-      };
-      // Añadir este método en el script setup
-function goBack() {
-  router.go(-1); // Navega a la página anterior
-}
-      // Cargar películas al montar el componente
-      onMounted(fetchMovies);
-      
-      return {
-        goBack,
-        allMovies,
-        loading,
-        searchQuery,
-        selectedGenre,
-        selectedYear,
-        selectedLanguage,
-        selectedFormat,
-        onlyStreaming,
-        genres,
-        years,
-        languages,
-        formats,
-        filteredMovies,
-        searchMovies,
-        goToMovie
-      };
+    });
+
+    const fetchMovies = async () => {
+      try {
+        loading.value = true;
+        const movies = await communicationManager.getAllMovies();
+        allMovies.value = movies;
+      } catch (error) {
+        console.error('Error al cargar películas:', error);
+      } finally {
+        loading.value = false;
+      }
+    };
+
+    const searchMovies = () => {
+      console.log('Buscando películas con filtros:', {
+        searchQuery: searchQuery.value,
+        genre: selectedGenre.value,
+        year: selectedYear.value,
+        language: selectedLanguage.value,
+        format: selectedFormat.value,
+        streaming: onlyStreaming.value
+      });
+    };
+
+    const goToMovie = (movieId) => {
+      router.push(`/movies/${movieId}`);
+    };
+
+    function goBack() {
+      router.go(-1);
     }
-  };
-  </script>
+
+    onMounted(fetchMovies);
+
+    return {
+      goBack,
+      allMovies,
+      loading,
+      searchQuery,
+      selectedGenre,
+      selectedYear,
+      selectedLanguage,
+      selectedFormat,
+      onlyStreaming,
+      genres,
+      years,
+      languages,
+      formats,
+      filteredMovies,
+      searchMovies,
+      goToMovie
+    };
+  }
+};
+</script>
+
   
   <style scoped>
-  /* This is already in your code and matches the first example */
 .back-button {
   background-color: #2b2d42;
   color: #8d99ae;

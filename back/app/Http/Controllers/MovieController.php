@@ -15,10 +15,8 @@ class MovieController extends Controller
         return response()->json($movies);
     }
     
- // Este método devuelve todas las películas, sin importar su estado de streaming
  public function getAllMovies()
  {
-     // Obtener todas las películas de la base de datos
      $movies = Movie::all();
 
      return response()->json($movies);
@@ -42,10 +40,8 @@ class MovieController extends Controller
             'disponible_en_streaming' => 'boolean',
         ]);
     
-        // Usar los datos validados para crear la película
         $movie = Movie::create($validated);
     
-        // Devolver la película creada
         return response()->json($movie, 201);
     }
     
@@ -64,7 +60,6 @@ class MovieController extends Controller
         // Buscar la película
         $movie = Movie::find($id);
     
-        // Si no se encuentra la película, retornar error 404
         if (!$movie) {
             return response()->json(['message' => 'Película no encontrada'], 404);
         }
@@ -86,10 +81,8 @@ class MovieController extends Controller
             'disponible_en_streaming' => 'nullable|boolean',
         ]);
     
-        // Actualizar la película con los datos validados
         $movie->update($validated);
     
-        // Retornar la película actualizada
         return response()->json($movie);
     }
     
@@ -106,7 +99,6 @@ class MovieController extends Controller
     }
     public function updateStreamingStatus($movie_id, Request $request)
     {
-        // Validar que el valor de disponible_en_streaming sea 0 o 1
         $request->validate([
             'disponible_en_streaming' => 'required|in:0,1'
         ]);
@@ -114,7 +106,6 @@ class MovieController extends Controller
         // Buscar la película por ID
         $movie = Movie::find($movie_id);
 
-        // Si la película no se encuentra, responder con un error 404
         if (!$movie) {
             return response()->json(['message' => 'Película no encontrada'], 404);
         }
@@ -123,7 +114,6 @@ class MovieController extends Controller
         $movie->disponible_en_streaming = $request->input('disponible_en_streaming');
         $movie->save();
 
-        // Devolver respuesta exitosa
         return response()->json(['message' => 'Estado de disponibilidad actualizado', 'movie' => $movie]);
     }
 }

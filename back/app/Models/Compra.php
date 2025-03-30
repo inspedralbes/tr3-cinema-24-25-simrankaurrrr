@@ -19,7 +19,6 @@ class Compra extends Model
         'estado'
     ];
 
-    // Indicamos que el campo butaca_ids es de tipo JSON y debe ser tratado como un array
     protected $casts = [
         'butaca_ids' => 'array',
     ];

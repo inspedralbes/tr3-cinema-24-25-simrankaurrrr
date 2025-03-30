@@ -116,7 +116,7 @@ export default {
   box-shadow: -4px 0 6px rgba(0, 0, 0, 0.1);
   padding: 20px;
   overflow-y: auto;
-  transform: translateX(0); /* Mostrar siempre visible desde la derecha */
+  transform: translateX(0); 
 }
 
 h2 {

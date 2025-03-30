@@ -12,7 +12,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('butacas', function (Blueprint $table) {
-            $table->id(); // Debería ser un bigIncrements
+            $table->id(); 
             $table->string('fila');
             $table->integer('columna');
             $table->boolean('vip')->default(false);

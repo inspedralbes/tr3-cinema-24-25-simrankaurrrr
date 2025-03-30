@@ -1,52 +1,50 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import communicationManager from '~/services/communicationManager';  // El archivo de servicio
+import communicationManager from '~/services/communicationManager';
 
-// Variables reactivas
 const router = useRouter();
-
 const isAdmin = ref(false);
 const selectedDate = ref(null);
-const selectedTime = ref('16');  // Hora seleccionada, por defecto 16
-const ocupacioMapa = ref([]);  // Mapa de ocupación
+const selectedTime = ref('16');
+const ocupacioMapa = ref([]);
 const entradas = ref({ normal: 0, vip: 0 });
 const recaptacio = ref({ normal: 0, vip: 0, total: 0 });
-const errorMessage = ref('');  // Variable para manejar los mensajes de error
-const errorOcupacion = ref(false);  // Nueva variable reactiva
+const errorMessage = ref('');
+const errorOcupacion = ref(false);
 
-// Verifica si el usuario es admin
 const checkAdmin = async () => {
   const token = localStorage.getItem('auth_token');
   if (token) {
     try {
-      const user = await communicationManager.getCurrentUser();  // Obtener usuario autenticado
-      isAdmin.value = user.role === 'admin';  // Verifica el rol del usuario
+      const user = await communicationManager.getCurrentUser();
+      isAdmin.value = user.role === 'admin';
     } catch (error) {
       console.error('Error verificando el rol:', error);
-      errorMessage.value = 'Error al verificar el rol del usuario.'; // Mostrar mensaje de error
+      errorMessage.value = 'Error al verificar el rol del usuario.';
     }
   }
 };
+
 function goBack() {
-  router.go(-1); // Navega a la página anterior
-};
+  router.go(-1);
+}
+
 const fetchOcupacio = async () => {
-  console.log("fetchOcupacio ejecutado", selectedDate.value, selectedTime.value);  // Debugging
+  console.log("fetchOcupacio ejecutado", selectedDate.value, selectedTime.value);
   if (selectedDate.value && selectedTime.value) {
     try {
-      const formattedDate = new Date(selectedDate.value).toISOString().split('T')[0];  // Fecha en formato YYYY-MM-DD
-      const movieId = 1; // Cambia este valor según la película seleccionada
-
+      const formattedDate = new Date(selectedDate.value).toISOString().split('T')[0];
+      const movieId = 1;
       const data = await communicationManager.getOcupacionByDate(movieId, formattedDate, selectedTime.value);
-      console.log("Datos obtenidos:", data);  // Verifica que los datos están bien
+      console.log("Datos obtenidos:", data);
 
       if (data && data.butacas) {
-        ocupacioMapa.value = data.butacas;  // Mapa de ocupación
-        errorOcupacion.value = false;  // No hubo error, ocultamos el mensaje
+        ocupacioMapa.value = data.butacas;
+        errorOcupacion.value = false;
       } else {
         ocupacioMapa.value = [];
-        errorOcupacion.value = true;  // Error, mostramos el mensaje
+        errorOcupacion.value = true;
       }
 
       if (data && data.entradasNormal !== undefined) {
@@ -63,43 +61,42 @@ const fetchOcupacio = async () => {
       }
     } catch (error) {
       console.error('Error al obtener ocupación:', error);
-      errorOcupacion.value = true;  // Si ocurre un error, mostramos el mensaje
+      errorOcupacion.value = true;
     }
   }
 };
 
-// Función que permite seleccionar una fecha
 const selectDate = (date) => {
   selectedDate.value = date;
-  fetchOcupacio();  // Llamada a la función para cargar los datos correspondientes
+  fetchOcupacio();
 };
 
-// Función que permite seleccionar una hora
 const selectTime = (time) => {
   selectedTime.value = time;
-  fetchOcupacio();  // Llamada a la función para cargar los datos correspondientes
+  fetchOcupacio();
 };
 
 onMounted(async () => {
-  await checkAdmin();  // Comprobamos si el usuario tiene privilegios de administrador
+  await checkAdmin();
 });
 </script>
+
 
 
 <template>
   <Navbar />
 
   <button @click="goBack" class="back-link">
-      ⬅ Tornar
-    </button>
-      <NuxtLink to="crud2" class="crud-link text-white bg-[#ef233c] hover:bg-[#d80032]">
-        Administrar Streaming i Sessions
-      </NuxtLink>
-      <NuxtLink to="crud3" class="crud-link text-white bg-[#ef233c] hover:bg-[#d80032]">
-        Administrar Pel·lícules
-      </NuxtLink>
+    ⬅ Tornar
+  </button>
+  <NuxtLink to="crud2" class="crud-link text-white bg-[#ef233c] hover:bg-[#d80032]">
+    Administrar Streaming i Sessions
+  </NuxtLink>
+  <NuxtLink to="crud3" class="crud-link text-white bg-[#ef233c] hover:bg-[#d80032]">
+    Administrar Pel·lícules
+  </NuxtLink>
   <div v-if="isAdmin" class="p-6">
-    <h1 class="text-2xl font-bold mb-4 text-[#2b2d42]">Consulta Administrativa: Ocupació i Recaptació</h1> 
+    <h1 class="text-2xl font-bold mb-4 text-[#2b2d42]">Consulta Administrativa: Ocupació i Recaptació</h1>
 
     <!-- Selector de data -->
     <div class="mb-4">
@@ -196,7 +193,8 @@ onMounted(async () => {
   margin: 20px;
 }
 
-h1, h2 {
+h1,
+h2 {
   color: #2b2d42;
   margin-bottom: 20px;
 }
@@ -240,7 +238,8 @@ table {
   margin-top: 20px;
 }
 
-th, td {
+th,
+td {
   padding: 12px 15px;
   text-align: left;
   border-bottom: 1px solid #8d99ae;
@@ -291,7 +290,7 @@ tr:hover {
     display: block;
     overflow-x: auto;
   }
-  
+
   .crud-buttons {
     flex-direction: column;
   }

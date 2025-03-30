@@ -3,7 +3,6 @@ import { ref, onMounted, watch } from 'vue';
 import communicationManager from '~/services/communicationManager';
 import { useRoute, useRouter } from 'vue-router';
 
-// Variables reactivas
 const router = useRouter();
 const user = ref(null);
 const movies = ref([]);
@@ -13,11 +12,10 @@ const loading = ref(false);
 const sessions = ref([]);
 const newSessionDate = ref('');
 const newSessionTime = ref('');
-const isDiaEspectador = ref(false); // Asegúrate de incluir esta variable reactiva para el checkbox
+const isDiaEspectador = ref(false);
 const isVisible = ref(false);
 const message = ref('');
 
-// Verificar el rol del usuario
 const checkUserRole = async () => {
   try {
     const currentUser = await communicationManager.getCurrentUser();
@@ -31,21 +29,18 @@ const checkUserRole = async () => {
   }
 };
 
-// Función para mostrar la alerta
 const showAlert = (msg) => {
   message.value = msg;
   isVisible.value = true;
   setTimeout(() => {
     closeAlert();
-  }, 3000); // Cierra la alerta después de 3 segundos
+  }, 3000); 
 };
 
-// Función para cerrar la alerta
 const closeAlert = () => {
   isVisible.value = false;
 };
 
-// Obtener todas las películas
 const fetchMovies = async () => {
   try {
     const moviesData = await communicationManager.getAllMovies();
@@ -55,9 +50,8 @@ const fetchMovies = async () => {
   }
 };
 
-// Obtener sesiones para la película seleccionada
 const fetchSessions = async () => {
-  if (!selectedMovieId.value) return;  // Evita hacer el fetch si no se ha seleccionado una película
+  if (!selectedMovieId.value) return; 
   loading.value = true;
   try {
     const sessionsData = await communicationManager.getSessionsByMovie(selectedMovieId.value);
@@ -83,14 +77,13 @@ const addSession = async () => {
   const newSession = {
     session_date: newSessionDate.value,  
     session_time: newSessionTime.value,  
-    dia_espectador: isDiaEspectador.value,  // Asegúrate de usar la variable correcta
+    dia_espectador: isDiaEspectador.value,  
   };
 
   try {
     const createdSession = await communicationManager.addSession(selectedMovieId.value, newSession);
     sessions.value.push(createdSession);
 
-    // Limpiar los campos del formulario
     newSessionDate.value = '';
     newSessionTime.value = '';
 
@@ -137,7 +130,7 @@ const updateStreamingStatus = async () => {
     const newStatus = streamingStatus.value === 1 ? 0 : 1;
     await communicationManager.updateStreamingStatus(selectedMovieId.value, { disponible_en_streaming: newStatus });
 
-    streamingStatus.value = newStatus; // Actualiza el valor de streamingStatus para reflejar el cambio
+    streamingStatus.value = newStatus; 
     showAlert('Estado actualizado correctamente');
   } catch (error) {
     console.error('Error actualizando estado:', error);
@@ -148,7 +141,7 @@ const updateStreamingStatus = async () => {
 
 };
 function goBack() {
-  router.go(-1); // Navega a la página anterior
+  router.go(-1); 
 };
 watch(selectedMovieId, async () => {
   console.log("ID de película seleccionada:", selectedMovieId.value);
@@ -156,7 +149,6 @@ watch(selectedMovieId, async () => {
   fetchSessions();
 });
 
-// Cargar datos al montar el componente
 onMounted(() => {
   checkUserRole();
 });

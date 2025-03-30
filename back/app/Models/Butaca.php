@@ -9,15 +9,13 @@ class Butaca extends Model
 {
     use HasFactory;
 
-    // Tabla asociada al modelo
     protected $table = 'butacas';
 
-    // Campos que pueden ser asignados masivamente
     protected $fillable = [
         'fila',
         'columna',
         'vip',
-        'precio' // Añadir el campo precio aquí
+        'precio' 
     ];
 
     public function movieSession()
@@ -29,7 +27,6 @@ class Butaca extends Model
     {
         return $this->hasMany(Reserva::class);
     }
-    // Relación con Compra (muchos a muchos)
     public function compras()
     {
         return $this->belongsToMany(Compra::class);

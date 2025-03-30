@@ -46,7 +46,6 @@ class PagosController extends Controller
             $compras = [];
             $butacasConInfo = [];
 
-            // Nombre único para el PDF
             $pdfFileName = "comprobante_{$request->nombre}_{$request->apellido}_" . time() . ".pdf";
             $pdfPath = "public/{$pdfFileName}";
 
@@ -73,7 +72,6 @@ class PagosController extends Controller
                         $codigoUnico = Str::uuid()->toString();
                         $butacaArray['codigo_unico'] = $codigoUnico;
 
-                        // Create JSON data for QR code
                         $jsonData = json_encode([
                             'codigo_unico' => $codigoUnico,
                             'nombre' => $request->nombre,
@@ -86,13 +84,12 @@ class PagosController extends Controller
                             'sala' => $sessionCompra->room_id
                         ]);
                         
-                        // Generate QR code with JSON data
                         $qrCode = QrCode::format('svg')
                             ->size(200)
                             ->generate($jsonData);
                         
                         $butacaArray['qr_code'] = 'data:image/svg+xml;base64,' . base64_encode($qrCode);
-                        $butacaArray['qr_data'] = $jsonData; // Store the JSON data
+                        $butacaArray['qr_data'] = $jsonData;
                         
                         $butacasConInfo[] = $butacaArray;
                     }
@@ -111,7 +108,7 @@ class PagosController extends Controller
                 'pdf_filename' => $pdfFileName
             ];
 
-            // Generar y guardar el PDF (opcional, si aún quieres enviarlo por correo)
+            // Generar y guardar el PDF 
             $pdf = Pdf::loadView('pdf.confirmacion', $data);
             $pdf->save(storage_path("app/{$pdfPath}"));
 
@@ -126,7 +123,7 @@ class PagosController extends Controller
                 return response()->json([
                     'message' => 'Pago procesado con éxito y correo enviado con PDF adjunto.',
                     'pdf_url' => url(Storage::url($pdfFileName)),
-                    'butacas' => $butacasConInfo // Return the seats with QR data
+                    'butacas' => $butacasConInfo 
                 ], 200);
                 
             } catch (\Exception $e) {
@@ -135,7 +132,7 @@ class PagosController extends Controller
                     'message' => 'Pago procesado pero hubo un error al enviar el correo.',
                     'error' => $e->getMessage(),
                     'pdf_url' => url(Storage::url($pdfFileName)),
-                    'butacas' => $butacasConInfo // Return the seats with QR data
+                    'butacas' => $butacasConInfo
                 ], 200);
             }
         }
@@ -180,12 +177,9 @@ class PagosController extends Controller
         ]);
     }
 
-    // Método para validar el código QR
     private function validarCodigoQR($codigo)
     {
-        // Implementa tu lógica de validación
-        // Por ejemplo, verificar en la base de datos si el código único existe
-        return true; // o false según corresponda
+        return true; 
     }
 
     private function validarPagoSimulado($numeroTarjeta, $cvv, $fechaVencimiento)

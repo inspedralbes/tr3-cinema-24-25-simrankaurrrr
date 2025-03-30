@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-// Ejemplo de modelo Pagos:
 class Pagos extends Model
 {
     use HasFactory;
@@ -25,12 +24,10 @@ class Pagos extends Model
     public $timestamps = true;
 }
 
-// Relación en el modelo Compra:
 class Compra extends Model
 {
     use HasFactory;
 
-    // Relación con Pagos
     public function pagos()
     {
         return $this->hasMany(Pagos::class, 'compra_id');

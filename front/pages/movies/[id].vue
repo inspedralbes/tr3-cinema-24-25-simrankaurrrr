@@ -86,15 +86,12 @@ const isLoading = ref(true);
 function goBack() {
   router.go(-1);
 }
-// Computed para simplificar la condición
 const isAvailableForStreaming = ref(false);
 
 async function fetchMovie() {
   try {
-    // 1. Obtener datos de la película
     movie.value = await $fetch(`${config.public.apiBase}/movies/${movieId}`);
     
-    // Verificar el valor real de streaming (convertir a string por si acaso)
     isAvailableForStreaming.value = String(movie.value.disponible_en_streaming) === '1';
     
     console.log('Streaming status:', {
@@ -103,7 +100,6 @@ async function fetchMovie() {
       isAvailable: isAvailableForStreaming.value
     });
 
-    // 2. Verificar sesiones solo si está disponible en streaming
     if (isAvailableForStreaming.value) {
       const sessions = await $fetch(`${config.public.apiBase}/sessions/movie/${movieId}`);
       hasAvailableSessions.value = Array.isArray(sessions) && sessions.length > 0;
@@ -125,7 +121,6 @@ onMounted(fetchMovie);
 </script>
 
 <style scoped>
-/* Tus estilos existentes... */
 .movie-page {
   background-color: #2b2d42;
   min-height: 100vh;

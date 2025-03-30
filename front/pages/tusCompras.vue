@@ -277,17 +277,15 @@ export default {
         const formatSeat = (seat) => {
     if (!seat) return 'No disponible';
     
-    // Si es un objeto con fila/columna
     if (seat.fila !== undefined && seat.columna !== undefined) {
         const filaChar = String.fromCharCode(65 + (Number(seat.fila) || 0));
-        const columnaNum = (Number(seat.columna) || 0); // <- Quitamos el +1 aquí
+        const columnaNum = (Number(seat.columna) || 0);
         return `${filaChar}${columnaNum}`;
     }
     
-    // Si es un ID numérico
     if (typeof seat === 'number') {
         const fila = String.fromCharCode(65 + Math.floor((seat - 1) / 10));
-        const numero = ((seat - 1) % 10); // <- Quitamos el +1 aquí
+        const numero = ((seat - 1) % 10); 
         return `${fila}${numero}`;
     }
     
@@ -342,21 +340,17 @@ export default {
             const ticket = tickets.value.find(t => t.id === ticketId);
             if (!ticket) return;
 
-            // Configuración del documento (85x55mm - tamaño estándar de entrada)
             const doc = new jsPDF({
                 orientation: 'portrait',
                 unit: 'mm',
                 format: [85, 55]
             });
 
-            // Dimensiones del documento
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
 
-            // Margen lateral
             const margin = 10;
 
-            // Función para texto centrado
             const centeredText = (text, y, fontSize = 10, isBold = false) => {
                 doc.setFontSize(fontSize);
                 doc.setFont("helvetica", isBold ? "bold" : "normal");
@@ -365,38 +359,31 @@ export default {
                 doc.text(text, x, y);
             };
 
-            // 1. Fondo
-            doc.setFillColor(43, 45, 66); // Azul oscuro
+            doc.setFillColor(43, 45, 66); 
             doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
-            // 2. Encabezado con color
-            doc.setFillColor(239, 35, 60); // Rojo
+            doc.setFillColor(239, 35, 60); 
             doc.rect(0, 0, pageWidth, 12, 'F');
 
-            // Texto del encabezado
-            doc.setTextColor(237, 242, 244); // Blanco
+            doc.setTextColor(237, 242, 244);
             centeredText("ENTRADA DE CINE", 8, 10, true);
 
-            // 3. Línea divisoria
-            doc.setDrawColor(237, 242, 244); // Blanco
+            doc.setDrawColor(237, 242, 244); 
             doc.setLineWidth(0.3);
             doc.line(margin, 14, pageWidth - margin, 14);
 
-            // 4. Título de la película (con manejo de caracteres especiales)
             const movieTitle = ticket.movie_title
                 .normalize("NFD")
                 .replace(/[\u0300-\u036f]/g, "")
                 .substring(0, 25)
                 .toUpperCase();
 
-            doc.setTextColor(237, 242, 244); // Blanco
+            doc.setTextColor(237, 242, 244); 
             centeredText(movieTitle, 22, 9, true);
 
-            // 5. Detalles de la entrada
             doc.setFontSize(7);
-            doc.setTextColor(237, 242, 244); // Blanco
+            doc.setTextColor(237, 242, 244); 
 
-            // Formatear fecha
             const options = { weekday: 'short', day: '2-digit', month: 'short' };
             const formattedDate = new Date(ticket.session_date)
                 .toLocaleDateString('es-ES', options);
@@ -405,18 +392,15 @@ export default {
             centeredText(`Hora: ${ticket.session_time.substring(0, 5)}`, 32);
             centeredText(`Butaca: ${formatSeat(ticket.butaca_ids[0])}`, 40);
             centeredText(`Precio: ${ticket.total_amount} €`, 36);
-            // 6. Código de ticket
             doc.setFontSize(5);
-            doc.setTextColor(150, 150, 150); // Gris
+            doc.setTextColor(150, 150, 150); 
 
-            // Línea divisoria
             const lineLength = 40;
             const lineX = (pageWidth - lineLength) / 2;
             doc.line(lineX, 48, lineX + lineLength, 48);
 
             centeredText(`Emisión: ${new Date().toLocaleDateString('es-ES')}`, 54);
 
-            // 7. Guardar el PDF
             const safeFilename = `Entrada_${movieTitle.replace(/\s+/g, '_')}_${ticket.id}.pdf`;
             doc.save(safeFilename);
         };
@@ -433,24 +417,21 @@ export default {
             try {
                 const doc = new jsPDF();
 
-                // Colores
-                const primaryColor = [239, 35, 60]; // Rojo
-                const secondaryColor = [43, 45, 66]; // Azul oscuro
+                const primaryColor = [239, 35, 60];
+                const secondaryColor = [43, 45, 66]; 
 
-                // Encabezado
+                
                 doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
                 doc.rect(0, 0, 210, 30, 'F');
                 doc.setFontSize(20);
                 doc.setTextColor(255, 255, 255);
                 doc.text('FACTURA DE COMPRA', 105, 20, { align: 'center' });
 
-                // Información de la factura
                 doc.setFontSize(12);
                 doc.setTextColor(0, 0, 0);
                 doc.text(`Factura #${ticket.id}`, 20, 45);
                 doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 20, 50);
 
-                // Detalles de la película
                 doc.setFontSize(14);
                 doc.text(ticket.movie_title, 20, 65);
 
@@ -460,7 +441,6 @@ export default {
                 doc.text(`Sala: ${ticket.room_name || 'N/A'}`, 20, 85);
                 doc.text(`Butacas: ${ticket.butaca_ids.join(', ')}`, 20, 90);
 
-                // Tabla de precios
                 doc.setFontSize(12);
                 doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
                 doc.text('Concepto', 20, 110);
@@ -478,19 +458,16 @@ export default {
                 doc.text('10.00 €', 160, 120, { align: 'right' });
                 doc.text(`${(ticket.butaca_ids.length * 10).toFixed(2)} €`, 190, 120, { align: 'right' });
 
-                // Total
                 doc.setFontSize(12);
                 doc.setFont("helvetica", "bold");
                 doc.text('TOTAL:', 160, 140);
                 doc.text(`${ticket.total_amount} €`, 190, 140, { align: 'right' });
 
-                // Pie de página
                 doc.setFontSize(10);
                 doc.setTextColor(150, 150, 150);
                 doc.text('Gracias por su compra', 105, 280, { align: 'center' });
                 doc.text('CineApp - Todos los derechos reservados', 105, 285, { align: 'center' });
 
-                // Guardar el PDF
                 const filename = `Factura_${ticket.movie_title.replace(/[^\w]/g, '_')}_${ticket.id}.pdf`;
                 doc.save(filename);
 
@@ -523,8 +500,7 @@ export default {
 
         const submitRating = async () => {
             try {
-                // Aquí iría la lógica para guardar el rating en el backend
-                // Por ahora simulamos que se guarda
+           
                 if (currentTicket.value) {
                     currentTicket.value.rating = currentRating.value;
                     alert(`¡Gracias por valorar "${currentMovieTitle.value}" con ${currentRating.value} estrellas!`);
@@ -571,7 +547,6 @@ export default {
 </script>
 
 <style scoped>
-/* Estilos para el botón de eliminar - igual que en el carrito */
 .action-btn.cancel-btn {
     background-color: #d80032;
     color: #edf2f4;
@@ -593,7 +568,6 @@ export default {
     transform: translateY(-2px);
 }
 
-/* Estilo para el overlay de reservado */
 .pending-overlay {
     position: absolute;
     top: 0;
@@ -610,7 +584,6 @@ export default {
     font-size: 1.2rem;
 }
 
-/* Ajustes para la tarjeta de reserva */
 .ticket-card.pending {
     border-left: 4px solid #FFC107;
 }
@@ -632,9 +605,7 @@ export default {
     margin: 20px;
     font-size: 1rem;
     position: relative;
-    /* Añade esto */
     z-index: 10;
-    /* Asegura que esté por encima de otros elementos */
 }
 
 .back-button:hover {
@@ -642,7 +613,6 @@ export default {
     border-color: #ef233c;
 }
 
-/* Unificar estilos de overlay */
 .pending-overlay,
 .past-overlay {
     position: absolute;
@@ -836,7 +806,6 @@ h1 {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    /* Añadido para incluir padding en el ancho */
 }
 
 .ticket-actions {
@@ -844,7 +813,6 @@ h1 {
     gap: 10px;
     margin-top: 15px;
     padding: 0 5px;
-    /* Añadido para espacio en los lados */
 }
 
 .action-btn {
@@ -1003,7 +971,6 @@ h1 {
     background-color: #d80032;
 }
 
-/* Estilos para el modal de rating */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -1105,7 +1072,6 @@ h1 {
 
     .ticket-info {
         padding: 15px;
-        /* Reducido para móviles */
     }
 
     .tabs {
@@ -1118,12 +1084,10 @@ h1 {
         justify-content: center;
     }
 
-    /* Botones en móviles */
     .ticket-actions {
         flex-direction: column;
         gap: 8px;
         padding: 0 10px;
-        /* Más espacio en los lados */
     }
 
     .action-btn {
@@ -1131,7 +1095,6 @@ h1 {
         padding: 10px;
         font-size: 0.9rem;
         margin: 0;
-        /* Asegura que no haya márgenes adicionales */
     }
 
     .ticket-header {
@@ -1159,7 +1122,6 @@ h1 {
         font-size: 1.1rem;
     }
 
-    /* Más espacio para botones en pantallas muy pequeñas */
     .ticket-actions {
         padding: 0 15px;
     }

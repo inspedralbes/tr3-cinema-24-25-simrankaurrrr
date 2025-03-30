@@ -30,12 +30,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/sessions/movie/{movie_id}', [MovieSessionController::class, 'getSessionsByMovie']);
     Route::post('/sessions/{id}', [MovieSessionController::class, 'store']);
     Route::get('/movies', [MovieController::class, 'index']);
-
     Route::get('/user-role', [UserController::class, 'getUserRole']);
-
-Route::post('/agregar-al-carrito', [ButacaController::class, 'agregarAlCarrito']);
-Route::get('/ver-carrito', [ButacaController::class, 'verCarrito']);
-Route::post('/confirmar-compra', [ButacaController::class, 'confirmarCompra']);});
+    Route::post('/agregar-al-carrito', [ButacaController::class, 'agregarAlCarrito']);
+    Route::get('/ver-carrito', [ButacaController::class, 'verCarrito']);
+    Route::post('/confirmar-compra', [ButacaController::class, 'confirmarCompra']);
+    });
 
     // Rutas para las películas
     Route::prefix('movies')->group(function() {

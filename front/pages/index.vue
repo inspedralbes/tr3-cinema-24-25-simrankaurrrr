@@ -57,7 +57,6 @@ html, body {
   width: 100%;
 }
 
-/* Contenedor de la película, ahora sin márgenes ni padding */
 .movie-container {
   width: 100%;
   margin-top: 0;

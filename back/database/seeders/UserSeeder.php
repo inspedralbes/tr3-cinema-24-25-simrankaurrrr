@@ -9,7 +9,6 @@ class UserSeeder extends Seeder
 {
     public function run()
     {
-        // Crear usuarios de prueba con datos completos
         User::create([
             'name' => 'user',
             'email' => 'user@gmail.com',
@@ -17,8 +16,8 @@ class UserSeeder extends Seeder
             'phone' => '123-456-7890',
             'address' => 'Calle Ficticia 123, Ciudad, País',
             'birthdate' => '1990-01-01',
-            'role' => 'user', // Puedes ajustar el rol según lo que desees (admin, user, etc.)
-            'auth_token' => null, // El token será generado más tarde
+            'role' => 'user',
+            'auth_token' => null,
         ]);
         
         User::create([

@@ -1,101 +1,102 @@
 <template>
-          <Navbar />
-         
-    <div class="search-page">
-      <button @click="goBack" class="back-button">
-      ⬅ Volver
+  <Navbar />
+   
+  <div class="search-page">
+    <button @click="goBack" class="back-button">
+      ⬅ Tornar
     </button>
-      <div class="search-container">
-        <h1>Buscar Películas</h1>
-        
-        <!-- Filtros de búsqueda -->
-        <div class="filters">
-          <div class="search-bar">
-            <input 
-              type="text" 
-              v-model="searchQuery" 
-              placeholder="Buscar por título, director o actores..."
-              @input="searchMovies"
-            />
-            <button @click="searchMovies">🔍</button>
-          </div>
-          
-          <div class="filter-group">
-            <label>Género:</label>
-            <select v-model="selectedGenre" @change="searchMovies">
-              <option value="">Todos</option>
-              <option v-for="genre in genres" :key="genre" :value="genre">{{ genre }}</option>
-            </select>
-          </div>
-          
-          <div class="filter-group">
-            <label>Año:</label>
-            <select v-model="selectedYear" @change="searchMovies">
-              <option value="">Todos</option>
-              <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
-            </select>
-          </div>
-          
-          <div class="filter-group">
-            <label>Idioma:</label>
-            <select v-model="selectedLanguage" @change="searchMovies">
-              <option value="">Todos</option>
-              <option v-for="lang in languages" :key="lang" :value="lang">{{ lang }}</option>
-            </select>
-          </div>
-          
-          <div class="filter-group">
-            <label>Formato:</label>
-            <select v-model="selectedFormat" @change="searchMovies">
-              <option value="">Todos</option>
-              <option v-for="format in formats" :key="format" :value="format">{{ format }}</option>
-            </select>
-          </div>
-          
-          <div class="filter-group checkbox-group">
-            <label>
-              <input type="checkbox" v-model="onlyStreaming" @change="searchMovies" />
-              Solo disponibles en streaming
-            </label>
-          </div>
+    <div class="search-container">
+      <h1>Cercar Pel·lícules</h1>
+      
+      <!-- Filtres de cerca -->
+      <div class="filters">
+        <div class="search-bar">
+          <input 
+            type="text" 
+            v-model="searchQuery" 
+            placeholder="Cercar per títol, director o actors..."
+            @input="searchMovies"
+          />
+          <button @click="searchMovies">🔍</button>
         </div>
         
-        <!-- Resultados de búsqueda -->
-        <div class="results">
-          <div v-if="loading" class="loading">Cargando películas...</div>
-          
-          <div v-else-if="filteredMovies.length === 0" class="no-results">
-            No se encontraron películas que coincidan con tus criterios de búsqueda.
-          </div>
-          
-          <div v-else class="movies-grid">
-            <div 
-              v-for="movie in filteredMovies" 
-              :key="movie.id" 
-              class="movie-card"
-              @click="goToMovie(movie.id)"
-            >
-              <div class="movie-poster">
-                <img :src="movie.poster_url || 'https://via.placeholder.com/300x450'" :alt="movie.title" />
-                <div v-if="movie.disponible_en_streaming" class="streaming-badge">STREAMING</div>
-              </div>
-              <div class="movie-info">
-                <h3>{{ movie.title }}</h3>
-                <p class="movie-year">{{ movie.año }}</p>
-                <p class="movie-genre">{{ movie.genero }}</p>
-                <p class="movie-director">Director: {{ movie.director }}</p>
-                <div class="movie-meta">
-                  <span>{{ movie.duracion }}</span>
-                  <span>{{ movie.idioma }}</span>
-                  <span>{{ movie.formato }}</span>
-                </div>
+        <div class="filter-group">
+          <label>Gènere:</label>
+          <select v-model="selectedGenre" @change="searchMovies">
+            <option value="">Tots</option>
+            <option v-for="genre in genres" :key="genre" :value="genre">{{ genre }}</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label>Any:</label>
+          <select v-model="selectedYear" @change="searchMovies">
+            <option value="">Tots</option>
+            <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label>Idioma:</label>
+          <select v-model="selectedLanguage" @change="searchMovies">
+            <option value="">Tots</option>
+            <option v-for="lang in languages" :key="lang" :value="lang">{{ lang }}</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label>Format:</label>
+          <select v-model="selectedFormat" @change="searchMovies">
+            <option value="">Tots</option>
+            <option v-for="format in formats" :key="format" :value="format">{{ format }}</option>
+          </select>
+        </div>
+        
+        <div class="filter-group checkbox-group">
+          <label>
+            <input type="checkbox" v-model="onlyStreaming" @change="searchMovies" />
+            Només disponibles en streaming
+          </label>
+        </div>
+      </div>
+      
+      <!-- Resultats de cerca -->
+      <div class="results">
+        <div v-if="loading" class="loading">Carregant pel·lícules...</div>
+        
+        <div v-else-if="filteredMovies.length === 0" class="no-results">
+          No es van trobar pel·lícules que coincideixin amb els teus criteris de cerca.
+        </div>
+        
+        <div v-else class="movies-grid">
+          <div 
+            v-for="movie in filteredMovies" 
+            :key="movie.id" 
+            class="movie-card"
+            @click="goToMovie(movie.id)"
+          >
+            <div class="movie-poster">
+              <img :src="movie.poster_url || 'https://via.placeholder.com/300x450'" :alt="movie.title" />
+              <div v-if="movie.disponible_en_streaming" class="streaming-badge">STREAMING</div>
+            </div>
+            <div class="movie-info">
+              <h3>{{ movie.title }}</h3>
+              <p class="movie-year">{{ movie.año }}</p>
+              <p class="movie-genre">{{ movie.genero }}</p>
+              <p class="movie-director">Director: {{ movie.director }}</p>
+              <div class="movie-meta">
+                <span>{{ movie.duracion }}</span>
+                <span>{{ movie.idioma }}</span>
+                <span>{{ movie.formato }}</span>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </template>
+  </div>
+</template>
+
   
   <script>
   import { ref, onMounted, computed } from 'vue';

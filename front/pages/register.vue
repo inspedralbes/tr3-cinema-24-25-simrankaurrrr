@@ -1,62 +1,66 @@
+Aquí tens el teu codi traduït al català! 😊  
+
+```vue
 <template>
   <div class="container" :class="{ 'right-panel-active': isRegisterActive }" id="container">
-    <!-- Formulario de Registro -->
+    <!-- Formulari de Registre -->
     <div class="form-container sign-up-container">
       <form @submit.prevent="handleRegister">
-        <h1>Create Account</h1>
+        <h1>Crea un compte</h1>
         <div class="social-container">
           <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
           <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
           <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
         </div>
-        <span>or use your email for registration</span>
-        <input type="text" placeholder="Name" v-model="registerData.name" required />
-        <input type="email" placeholder="Email" v-model="registerData.email" required />
-        <input type="password" placeholder="Password" v-model="registerData.password" required />
-        <input type="tel" placeholder="Phone" v-model="registerData.phone" required />
-        <input type="text" placeholder="Address" v-model="registerData.address" required />
-        <input type="date" placeholder="Birthdate" v-model="registerData.birthdate" required />
+        <span>o utilitza el teu correu electrònic per registrar-te</span>
+        <input type="text" placeholder="Nom" v-model="registerData.name" required />
+        <input type="email" placeholder="Correu electrònic" v-model="registerData.email" required />
+        <input type="password" placeholder="Contrasenya" v-model="registerData.password" required />
+        <input type="tel" placeholder="Telèfon" v-model="registerData.phone" required />
+        <input type="text" placeholder="Adreça" v-model="registerData.address" required />
+        <input type="date" placeholder="Data de naixement" v-model="registerData.birthdate" required />
       
-        <button type="submit">Sign Up</button>
+        <button type="submit">Registra't</button>
       </form>
     </div>
 
-    <!-- Formulario de Login -->
+    <!-- Formulari d'Inici de Sessió -->
     <div class="form-container sign-in-container">
       <form @submit.prevent="handleLogin">
-        <h1>Sign in</h1>
+        <h1>Inicia sessió</h1>
         <div class="social-container">
           <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
           <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
           <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
         </div>
-        <span>or use your account</span>
-        <input type="email" placeholder="Email" v-model="loginData.email" required />
-        <input type="password" placeholder="Password" v-model="loginData.password" required />
-        <button type="submit">Sign In</button>
+        <span>o utilitza el teu compte</span>
+        <input type="email" placeholder="Correu electrònic" v-model="loginData.email" required />
+        <input type="password" placeholder="Contrasenya" v-model="loginData.password" required />
+        <button type="submit">Inicia sessió</button>
       </form>
     </div>
 
-    <!-- Overlay -->
+    <!-- Superposició -->
     <div class="overlay-container">
       <div class="overlay">
         <div class="overlay-panel overlay-left">
-          <h1>Welcome Back!</h1>
-          <p>To keep connected with us please login with your personal info</p>
-          <button class="ghost" @click="toggleRegister(false)">Sign In</button>
+          <h1>Benvingut de nou!</h1>
+          <p>Per mantenir-te connectat amb nosaltres, inicia sessió amb la teva informació personal</p>
+          <button class="ghost" @click="toggleRegister(false)">Inicia sessió</button>
         </div>
         <div class="overlay-panel overlay-right">
-          <h1>Hello, Friend!</h1>
-          <p>Enter your personal details and start journey with us</p>
-          <button class="ghost" @click="toggleRegister(true)">Sign Up</button>
+          <h1>Hola, amic!</h1>
+          <p>Introdueix les teves dades personals i comença el teu viatge amb nosaltres</p>
+          <button class="ghost" @click="toggleRegister(true)">Registra't</button>
         </div>
       </div>
     </div>
 
-    <!-- Mensaje de error -->
+    <!-- Missatge d'error -->
     <div v-if="error" class="error-message">{{ error }}</div>
   </div>
 </template>
+
 
 <script setup>
 import { ref } from 'vue';

@@ -1,40 +1,41 @@
 <template>
   <header class="header">
     <div class="header-container">
-      <!-- Logo o Nombre del Sitio -->
+      <!-- Logo o Nom del Lloc -->
       <h1><span style="color: #ef233c;">MD</span>VD</h1>
 
-      <!-- Enlaces de navegación -->
+      <!-- Enllaços de navegació -->
       <nav class="nav-links">
-        <NuxtLink to="/" class="nav-link">Home</NuxtLink>
-        <NuxtLink to="/buscar" class="nav-link">Buscar</NuxtLink>
-        <NuxtLink to="/tusCompras" class="nav-link">Tus compras</NuxtLink>
+        <NuxtLink to="/" class="nav-link">Inici</NuxtLink>
+        <NuxtLink to="/buscar" class="nav-link">Cercar</NuxtLink>
+        <NuxtLink to="/tusCompras" class="nav-link">Les teves compres</NuxtLink>
 
-        <!-- Mostrar CRUD solo si el usuario es admin -->
+        <!-- Mostrar CRUD només si l'usuari és admin -->
         <NuxtLink v-if="isAdmin" to="/crud1" class="nav-link">Crud</NuxtLink>
       </nav>
 
-      <!-- Botones -->
+      <!-- Botons -->
       <div class="button-container">
-        <!-- Botón de Carrito -->
+        <!-- Botó de Carrito -->
         <button @click="toggleCarritoPopup" class="button cart-button">
           🛒 Carrito
         </button>
 
-        <!-- Botón de Iniciar sesión o Logout -->
+        <!-- Botó d'Iniciar sessió o Logout -->
         <button v-if="!isLoggedIn" @click="goToLogin" class="button login-button">
-          Iniciar sesión
+          Iniciar sessió
         </button>
         <button v-else @click="logout" class="button logout-button">
-          Logout
+          Tancar sessió
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Mostrar el componente Carrito cuando se hace clic en el botón -->
+  <!-- Mostrar el component Carrito quan es fa clic al botó -->
   <Carrito v-if="showCarrito" />
 </template>
+
 
 <script setup>
 import { ref, onMounted } from 'vue';

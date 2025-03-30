@@ -3,15 +3,14 @@
 
   <div class="nav-links">
     <button @click="goBack" class="back-link">
-      ⬅ Volver
+      ⬅ Tornar
     </button>
     <div class="crud-links">
       <NuxtLink to="crud1" class="crud-link">
         Consulta Administrativa
       </NuxtLink>
       <NuxtLink to="crud2" class="crud-link">
-        Administrar Streaming y Sessions
-
+        Administrar Streaming i Sessions
       </NuxtLink>
     </div>
   </div>
@@ -28,12 +27,12 @@
   </div>
 
   <div class="container">
-    <!-- Sección de Listado de Películas -->
+    <!-- Secció de Llistat de Pel·lícules -->
     <div v-if="currentView === 'list'" class="movie-list">
       <div class="list-header">
-        <h1>Lista de Películas</h1>
+        <h1>Llista de Pel·lícules</h1>
         <button @click="currentView = 'create'" class="create-btn">
-          + Nueva Película
+          + Nova Pel·lícula
         </button>
       </div>
 
@@ -41,20 +40,20 @@
         <table class="movie-table">
           <thead>
             <tr>
-              <th>Título</th>
-              <th class="mobile-hidden">Sinopsis</th>
-              <th class="mobile-hidden">Duración</th>
+              <th>Títol</th>
+              <th class="mobile-hidden">Sinopsi</th>
+              <th class="mobile-hidden">Durada</th>
               <th class="mobile-hidden">Director</th>
-              <th class="mobile-hidden">Actores</th>
-              <th class="mobile-hidden">Año</th>
-              <th>Género</th>
-              <th>Póster</th>
-              <th class="mobile-hidden">Trailer</th>
+              <th class="mobile-hidden">Actors</th>
+              <th class="mobile-hidden">Any</th>
+              <th>Gènere</th>
+              <th>Pòster</th>
+              <th class="mobile-hidden">Tràiler</th>
               <th class="mobile-hidden">Idioma</th>
-              <th>Subs</th>
-              <th class="mobile-hidden">Formato</th>
-              <th>Stream</th>
-              <th>Acciones</th>
+              <th>Subtítols</th>
+              <th class="mobile-hidden">Format</th>
+              <th>Streaming</th>
+              <th>Accions</th>
             </tr>
           </thead>
           <tbody>
@@ -67,10 +66,10 @@
               <td class="mobile-hidden">{{ movie.año }}</td>
               <td>{{ truncateText(movie.genero, 10) }}</td>
               <td>
-                <img :src="movie.poster_url" alt="Póster" class="poster-img" />
+                <img :src="movie.poster_url" alt="Pòster" class="poster-img" />
               </td>
               <td class="mobile-hidden">
-                <a v-if="movie.trailer_url" :href="movie.trailer_url" target="_blank" class="trailer-link">Ver</a>
+                <a v-if="movie.trailer_url" :href="movie.trailer_url" target="_blank" class="trailer-link">Veure</a>
               </td>
               <td class="mobile-hidden">{{ movie.idioma }}</td>
               <td>{{ movie.subtitulos ? 'Sí' : 'No' }}</td>
@@ -86,22 +85,22 @@
       </div>
     </div>
 
-    <!-- Sección para Crear o Editar Película -->
+    <!-- Secció per Crear o Editar Pel·lícula -->
     <div v-if="currentView === 'create' || currentView === 'edit'" class="movie-form">
-      <h1>{{ currentView === 'edit' ? 'Editar Película' : 'Crear Nueva Película' }}</h1>
+      <h1>{{ currentView === 'edit' ? 'Editar Pel·lícula' : 'Crear Nova Pel·lícula' }}</h1>
       <form @submit.prevent="currentView === 'edit' ? updateMovie() : createMovie" class="form-grid">
         <div class="form-group">
-          <label for="title">Título</label>
+          <label for="title">Títol</label>
           <input type="text" id="title" v-model="newMovie.title" required />
         </div>
         
         <div class="form-group full-width">
-          <label for="sinopsis">Sinopsis</label>
+          <label for="sinopsis">Sinopsi</label>
           <textarea id="sinopsis" v-model="newMovie.sinopsis" required></textarea>
         </div>
         
         <div class="form-group">
-          <label for="duracion">Duración</label>
+          <label for="duracion">Durada</label>
           <input type="text" id="duracion" v-model="newMovie.duracion" required />
         </div>
         
@@ -111,30 +110,30 @@
         </div>
         
         <div class="form-group">
-          <label for="actores">Actores</label>
+          <label for="actores">Actors</label>
           <input type="text" id="actores" v-model="newMovie.actores" required />
         </div>
         
         <div class="form-group">
-          <label for="año">Año</label>
+          <label for="año">Any</label>
           <input type="number" id="año" v-model="newMovie.año" required />
         </div>
         
         <div class="form-group">
-          <label for="genero">Género</label>
+          <label for="genero">Gènere</label>
           <input type="text" id="genero" v-model="newMovie.genero" required />
         </div>
         
         <div class="form-group full-width">
-          <label for="poster">Póster</label>
+          <label for="poster">Pòster</label>
           <input type="file" @change="uploadImage" class="file-input" />
           <div v-if="imageUrl" class="image-preview">
-            <img :src="imageUrl" alt="Uploaded image" />
+            <img :src="imageUrl" alt="Imatge carregada" />
           </div>
         </div>
         
         <div class="form-group full-width">
-          <label for="trailer">Subir Trailer (Video)</label>
+          <label for="trailer">Puja el tràiler (Vídeo)</label>
           <input type="file" @change="uploadTrailer" accept="video/*" class="file-input" />
         </div>
         
@@ -145,29 +144,30 @@
         
         <div class="form-group checkbox-group">
           <input type="checkbox" id="subtitulos" v-model="newMovie.subtitulos" />
-          <label for="subtitulos">Subtítulos</label>
+          <label for="subtitulos">Subtítols</label>
         </div>
         
         <div class="form-group">
-          <label for="formato">Formato</label>
+          <label for="formato">Format</label>
           <input type="text" id="formato" v-model="newMovie.formato" />
         </div>
         
         <div class="form-group checkbox-group">
           <input type="checkbox" id="disponible_en_streaming" v-model="newMovie.disponible_en_streaming" />
-          <label for="disponible_en_streaming">Streaming</label>
+          <label for="disponible_en_streaming">Disponible en streaming</label>
         </div>
         
         <div class="form-buttons full-width">
           <button type="submit" class="submit-btn">
-            {{ currentView === 'edit' ? 'Actualizar' : 'Crear' }}
+            {{ currentView === 'edit' ? 'Actualitzar' : 'Crear' }}
           </button>
-          <button @click="currentView = 'list'" class="cancel-btn">Cancelar</button>
+          <button @click="currentView = 'list'" class="cancel-btn">Cancel·lar</button>
         </div>
       </form>
     </div>
   </div>
 </template>
+
 
 
 <script>

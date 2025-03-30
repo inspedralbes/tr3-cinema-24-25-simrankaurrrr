@@ -1,30 +1,30 @@
 <template>
   <div>
-    <!-- Carrito desplegable -->
+    <!-- Carro desplegable -->
     <div class="carrito-overlay" v-if="isCarritoVisible" @click="cerrarCarrito">
       <div class="carrito-container" @click.stop>
-        <h2>Carrito de Reservas</h2>
+        <h2>Carro de Reserves</h2>
 
         <ul v-if="carrito.length > 0">
           <li v-for="(reserva, index) in carrito" :key="reserva.reserva_id">
-            <p>🎬 Película: {{ reserva.nombre_pelicula }}</p>
-            <p>📍 Asiento: Fila {{ reserva.fila }}, Columna {{ reserva.columna }}</p>
-            <p>💲 Precio: {{ reserva.precio }}  €</p>
+            <p>🎬 Pel·lícula: {{ reserva.nombre_pelicula }}</p>
+            <p>📍 Seient: Fila {{ reserva.fila }}, Columna {{ reserva.columna }}</p>
+            <p>💲 Preu: {{ reserva.precio }} €</p>
 
-            <!-- Botón de Eliminar -->
+            <!-- Botó per Eliminar -->
             <button @click="eliminarReserva(reserva.reserva_id, index)" class="btn-eliminar">❌ Eliminar</button>
           </li>
         </ul>
 
-        <p v-else>No tienes reservas en el carrito.</p>
+        <p v-else>No tens reserves al carro.</p>
 
-        <!-- Mensaje de error si se superan las 10 entradas -->
+        <!-- Missatge d'error si es superen les 10 entrades -->
         <p v-if="mensajeError" class="mensaje-error">{{ mensajeError }}</p>
 
-        <!-- Botón para ir a la página de compra -->
+        <!-- Botó per anar a la pàgina de compra -->
         <div v-if="carrito.length > 0">
           <NuxtLink to="/compra" class="btn-compra">
-            Ir a compra
+            Anar a compra
           </NuxtLink>
           <br><br>
         </div>
@@ -32,6 +32,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 import communicationManager from '@/services/communicationManager';

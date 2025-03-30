@@ -9,7 +9,7 @@ export default defineNuxtConfig({
   // Configuración runtime (variables de entorno)
   runtimeConfig: {
     public: {
-      apiBase: 'http://mdvd.daw.inspedralbes.cat/back/public/api' // Base URL de la API
+      apiBase: 'http://mdvdback.daw.inspedralbes.cat/api' // Base URL de la API
     }
   },
 

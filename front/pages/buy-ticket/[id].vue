@@ -1,29 +1,29 @@
 <template>
-      <Navbar />
+  <Navbar />
 
   <div class="container">
     <div class="back-button-container">
-
-    <button @click="goBack" class="back-button">
-      ⬅ Volver
-    </button>
+      <button @click="goBack" class="back-button">
+        ⬅ Tornar
+      </button>
     </div>
-    <!-- Alert Modal -->
+    <!-- Modal d'Alerta -->
     <div v-if="alertMessage" class="alert-modal">
       <div class="alert-content">
         <h3>{{ alertMessage }}</h3>
-        <button @click="closeAlert" class="alert-close-button">Cerrar</button>
+        <button @click="closeAlert" class="alert-close-button">Tancar</button>
       </div>
     </div>
 
     <div v-if="movie" class="movie-container">
       <h1 class="movie-title">{{ movie.title }}</h1>
-      <img :src="movie.poster_url" alt="Poster" class="movie-poster" />    </div>
+      <img :src="movie.poster_url" alt="Poster" class="movie-poster" />
+    </div>
 
     <div v-if="availableDates.length > 0" class="selection-container">
-      <h2 class="selection-title">Selecciona una Fecha</h2>
+      <h2 class="selection-title">Selecciona una Data</h2>
       <select v-model="selectedDate" @change="fetchSessionsForDate(selectedDate)" class="select-box" required>
-        <option value="" disabled selected>Selecciona una Fecha</option>
+        <option value="" disabled selected>Selecciona una Data</option>
         <option v-for="date in availableDates" :key="date" :value="date">
           {{ formatDate(date) }}
         </option>
@@ -31,26 +31,28 @@
     </div>
 
     <div v-if="sessions.length > 0" class="selection-container">
-      <h2 class="selection-title">Selecciona una Sesión</h2>
+      <h2 class="selection-title">Selecciona una Sessió</h2>
       <select v-model="selectedSession" @change="selectSession($event.target.value)" class="select-box" required>
-        <option value="" disabled selected>Selecciona una Sesión</option>
+        <option value="" disabled selected>Selecciona una Sessió</option>
         <option v-for="session in sessions" :key="session.id" :value="session.id">
           {{ formatTime(session.session_time) }}
         </option>
       </select>
     </div>
+
     <div v-if="seatsData.length > 0" class="selection-container">
-      <h2 class="selection-title">Selecciona tus Butacas</h2>
+      <h2 class="selection-title">Selecciona els teus Seients</h2>
       
       <div class="legend">
-        <span class="seat-bought">Comprado</span>
-        <span class="seat-reserved">Reservado</span>
-        <span class="seat-selected">Seleccionado</span>
+        <span class="seat-bought">Comprat</span>
+        <span class="seat-reserved">Reservat</span>
+        <span class="seat-selected">Seleccionat</span>
         <span class="seat-available">Disponible</span>
       </div>
+      
       <div v-if="selectedSeats.length > 0" class="button-group">
         <button v-if="!isUserLoggedIn" @click="showLoginPopup" class="action-button login-button">
-          Iniciar sesión
+          Iniciar sessió
         </button>
         <button v-if="isUserLoggedIn" @click="reservarAsientos" class="action-button reserve-button">
           Reservar Entrada
@@ -59,34 +61,33 @@
           Pagar
         </button>
       </div>
+      
       <div class="seat-grid">
-    <button v-for="butaca in seatsData" :key="butaca.id" 
-      :class="{
-        'seat-bought': butaca.estado === 'comprado',
-        'seat-reserved': butaca.estado === 'reservado',
-        'seat-selected': isSeatSelected(butaca),
-        'seat-available': butaca.estado === 'disponible' && !isSeatSelected(butaca)
-      }"
-      class="seat-button"
-      :disabled="butaca.estado === 'comprado' || butaca.estado === 'reservado' || butaca.estado === 'en_proceso'"
-      @click="selectSeat(butaca)">
-      {{ butaca.fila }}{{ butaca.columna }}
-    </button>
-  </div>
-
-
-     
+        <button v-for="butaca in seatsData" :key="butaca.id" 
+          :class="{
+            'seat-bought': butaca.estado === 'comprado',
+            'seat-reserved': butaca.estado === 'reservado',
+            'seat-selected': isSeatSelected(butaca),
+            'seat-available': butaca.estado === 'disponible' && !isSeatSelected(butaca)
+          }"
+          class="seat-button"
+          :disabled="butaca.estado === 'comprado' || butaca.estado === 'reservado' || butaca.estado === 'en_proceso'"
+          @click="selectSeat(butaca)">
+          {{ butaca.fila }}{{ butaca.columna }}
+        </button>
+      </div>
     </div>
 
     <div v-if="showLogin" class="login-popup">
       <div class="login-container">
-        <h3 class="login-title">Inicia sesión para continuar</h3>
-        <button @click="redirectToLogin" class="action-button login-button">Iniciar sesión</button>
-        <button @click="closeLoginPopup" class="close-button">Cerrar</button>
+        <h3 class="login-title">Inicia sessió per continuar</h3>
+        <button @click="redirectToLogin" class="action-button login-button">Iniciar sessió</button>
+        <button @click="closeLoginPopup" class="close-button">Tancar</button>
       </div>
     </div>
   </div>
 </template>
+
 
 <script setup>
 // Lógica de Vue

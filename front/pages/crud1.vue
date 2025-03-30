@@ -90,24 +90,24 @@ onMounted(async () => {
   <Navbar />
 
   <button @click="goBack" class="back-link">
-      ⬅ Volver
+      ⬅ Tornar
     </button>
       <NuxtLink to="crud2" class="crud-link text-white bg-[#ef233c] hover:bg-[#d80032]">
-        Administrar Streaming y Sessions
-            </NuxtLink>
+        Administrar Streaming i Sessions
+      </NuxtLink>
       <NuxtLink to="crud3" class="crud-link text-white bg-[#ef233c] hover:bg-[#d80032]">
-        Administrar Películas
+        Administrar Pel·lícules
       </NuxtLink>
   <div v-if="isAdmin" class="p-6">
-    <h1 class="text-2xl font-bold mb-4 text-[#2b2d42]">Consulta Administrativa: Ocupación y Recaptación</h1> 
+    <h1 class="text-2xl font-bold mb-4 text-[#2b2d42]">Consulta Administrativa: Ocupació i Recaptació</h1> 
 
-    <!-- Selector de fecha -->
+    <!-- Selector de data -->
     <div class="mb-4">
-      <label for="date" class="text-lg text-[#2b2d42]">Selecciona un día:</label>
+      <label for="date" class="text-lg text-[#2b2d42]">Selecciona un dia:</label>
       <input type="date" v-model="selectedDate" @change="selectDate(selectedDate)" class="input-field">
     </div>
 
-    <!-- Selector de hora -->
+    <!-- Selector d'hora -->
     <div class="mb-4">
       <label for="time" class="text-lg text-[#2b2d42]">Selecciona una hora:</label>
       <select v-model="selectedTime" @change="selectTime(selectedTime)" class="input-field">
@@ -117,36 +117,36 @@ onMounted(async () => {
       </select>
     </div>
 
-    <h2 class="text-xl font-bold text-[#2b2d42]">Mapa de Ocupación</h2>
+    <h2 class="text-xl font-bold text-[#2b2d42]">Mapa d'Ocupació</h2>
     <div v-if="errorOcupacion" class="text-red-500 text-xl font-bold">
-      Error al obtener la ocupación. Por favor, intente de nuevo más tarde.
+      Error en obtenir l'ocupació. Si us plau, intenta-ho de nou més tard.
     </div>
 
-    <!-- Mostrar la tabla solo si no hay error -->
+    <!-- Mostrar la taula només si no hi ha error -->
     <div v-else>
-      <p class="text-[#2b2d42]">Mapa de ocupación de las butacas para la fecha seleccionada:</p>
+      <p class="text-[#2b2d42]">Mapa d'ocupació de les butaques per a la data seleccionada:</p>
 
-      <!-- Informe de recaptación -->
+      <!-- Informe de recaptació -->
       <div v-if="entradas && recaptacio" class="recaptacio mb-6 text-[#2b2d42]">
-        <h2 class="text-xl font-bold text-[#ef233c]">Informe de Recaptación</h2>
+        <h2 class="text-xl font-bold text-[#ef233c]">Informe de Recaptació</h2>
         <ul class="list-disc pl-6">
-          <li>Entradas Normal: {{ entradas.normal }}</li>
-          <li>Entradas VIP: {{ entradas.vip }}</li>
-          <li>Recaudación Normal: {{ recaptacio.normal }} €</li>
-          <li>Recaudación VIP: {{ recaptacio.vip }} €</li>
-          <li>Recaptación total: {{ recaptacio.total }} €</li>
+          <li>Entrades Normal: {{ entradas.normal }}</li>
+          <li>Entrades VIP: {{ entradas.vip }}</li>
+          <li>Recaudació Normal: {{ recaptacio.normal }} €</li>
+          <li>Recaudació VIP: {{ recaptacio.vip }} €</li>
+          <li>Recaptació total: {{ recaptacio.total }} €</li>
         </ul>
       </div>
 
-      <!-- Tabla de butacas -->
+      <!-- Taula de butaques -->
       <table class="min-w-full table-auto border-collapse">
         <thead>
           <tr class="bg-[#8d99ae]">
             <th class="px-4 py-2 text-white">Fila</th>
             <th class="px-4 py-2 text-white">Columna</th>
-            <th class="px-4 py-2 text-white">Estado</th>
+            <th class="px-4 py-2 text-white">Estat</th>
             <th class="px-4 py-2 text-white">VIP</th>
-            <th class="px-4 py-2 text-white">Precio (€)</th>
+            <th class="px-4 py-2 text-white">Preu (€)</th>
           </tr>
         </thead>
         <tbody>
@@ -162,11 +162,13 @@ onMounted(async () => {
     </div>
   </div>
 
-  <!-- Si el usuario no es admin, mostramos un mensaje -->
   <div v-else class="text-center p-6 text-red-500 text-xl font-bold">
-    No tienes permisos para ver esta página.
+    No tens permisos per veure aquesta pàgina.
   </div>
 </template>
+
+
+
 <style scoped>
 .back-link {
   display: inline-block;

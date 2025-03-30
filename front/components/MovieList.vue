@@ -1,10 +1,10 @@
 <template>
   <div>
-    <!-- Carrusel de películas -->
+    <!-- Carrusel de pel·lícules -->
     <div class="carousel" :style="carouselStyle">
-      <!-- Texto "Añadido recientemente" -->
+      <!-- Text "Afegit recentment" -->
 
-      <!-- Lista de películas -->
+      <!-- Llista de pel·lícules -->
       <div class="list">
         <div v-for="(movie, index) in movies" :key="movie.id" class="item" :class="{ active: index === activeIndex }">
           <div class="content">
@@ -14,20 +14,20 @@
               <div class="left-side">
                 <h1>{{ movie.title }}</h1>
                 <div class="details">
-                  <p><strong>Duración:</strong> {{ movie.duracion }} </p>
-                  <p><strong>Género:</strong> {{ movie.genero }}</p>
-                  <p><strong>Año:</strong> {{ movie.año }}</p>
+                  <p><strong>Durada:</strong> {{ movie.duracion }} </p>
+                  <p><strong>Gènere:</strong> {{ movie.genero }}</p>
+                  <p><strong>Any:</strong> {{ movie.año }}</p>
                   <p><strong>Director:</strong> {{ movie.director }}</p>
                 </div>
-                <h4><strong>Sinopsis:</strong> {{ movie.sinopsis }}</h4>
+                <h4><strong>Sinopsi:</strong> {{ movie.sinopsis }}</h4>
                 <div class="buttons">
-                  <button class="download-btn" @click="downloadMoviePDF">Descargar Información</button>
-                                                    <button class="buy-tickets-btn" @click="goToMoviePage(activeMovie?.id)">Comprar Entradas</button>
-                  <button class="trailer-btn" @click="playTrailer(movie.trailer_url)">Ver Trailer</button>
+                  <button class="download-btn" @click="downloadMoviePDF">Descarregar Informació</button>
+                  <button class="buy-tickets-btn" @click="goToMoviePage(activeMovie?.id)">Comprar Entrades</button>
+                  <button class="trailer-btn" @click="playTrailer(movie.trailer_url)">Veure Tràiler</button>
                 </div>
               </div>
 
-              <!-- Trailer a la derecha -->
+              <!-- Tràiler a la dreta -->
               <div v-if="movie.trailer_url" class="right-side">
                 <div class="vid-box">
                   <video :src="movie.trailer_url" controls class="vid-trailer"></video>
@@ -38,8 +38,7 @@
         </div>
       </div>
 
-
-      <!-- Miniaturas de películas -->
+      <!-- Miniatures de pel·lícules -->
       <div class="thumbnail-container">
         <div class="thumbnail" ref="thumbnailContainer">
           <div v-for="(movie, index) in movies" :key="movie.id" class="item" :class="{ active: index === activeIndex }"
@@ -53,17 +52,18 @@
         </div>
       </div>
 
-      <!-- Flechas de navegación -->
+      <!-- Fletxes de navegació -->
       <div class="arrows">
         <button id="prev" @click="prevSlide">‹</button>
         <button id="next" @click="nextSlide">›</button>
       </div>
 
-      <!-- Barra de tiempo -->
+      <!-- Barra de temps -->
       <div class="time"></div>
     </div>
   </div>
 </template>
+
 
 <script setup lang="ts">import { ref, onMounted, computed, nextTick } from 'vue';
 import { useRouter } from 'vue-router';

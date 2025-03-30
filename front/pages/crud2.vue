@@ -165,25 +165,24 @@ defineExpose({
   showAlert
 });
 </script>
-
 <template>
   <Navbar />
 
   <button @click="goBack" class="back-link">
-      ⬅ Volver
+      ⬅ Tornar
     </button>
 
   <NuxtLink to="crud1" class="crud-link">
     Consulta Administrativa
-    </NuxtLink>
+  </NuxtLink>
   <NuxtLink to="crud3" class="crud-link">
-    Administrar Películas
+    Administrar Pel·lícules
   </NuxtLink>
 
   <div v-if="user?.role === 'admin'" class="p-6">
-    <h1 class="text-2xl font-bold mb-4">Administrar Películas y Sessions</h1>
+    <h1 class="text-2xl font-bold mb-4">Administrar Pel·lícules i Sessions</h1>
     <div>
-      <label for="movie" class="text-lg">Selecciona una Película:</label>
+      <label for="movie" class="text-lg">Selecciona una Pel·lícula:</label>
       <select v-model="selectedMovieId" class="border px-4 py-2 rounded w-full">
         <option v-for="movie in movies" :key="movie.id" :value="movie.id">
           {{ movie.title }}
@@ -192,24 +191,24 @@ defineExpose({
     </div>
 
     <div v-if="selectedMovieId !== null" class="mt-4">
-      <p class="text-lg">Estado actual: 
+      <p class="text-lg">Estat actual: 
         <strong>{{ streamingStatus === 1 ? 'Disponible' : 'No Disponible' }}</strong>
       </p>
 
       <button @click="updateStreamingStatus" :disabled="loading">
-        Update status
+        Actualitzar estat
       </button>
     </div>
 
     <div v-if="selectedMovieId !== null" class="mt-6">
-      <h2 class="text-xl font-semibold">Añadir nueva sesión</h2>
+      <h2 class="text-xl font-semibold">Afegir nova sessió</h2>
       <form @submit.prevent="addSession">
         <div class="mb-4">
-          <label for="sessionDate" class="text-lg">Fecha de la sesión:</label>
+          <label for="sessionDate" class="text-lg">Data de la sessió:</label>
           <input type="date" v-model="newSessionDate" class="border px-4 py-2 rounded w-full">
         </div>
         <div class="mb-4">
-          <label for="sessionTime" class="text-lg">Hora de la sesión:</label>
+          <label for="sessionTime" class="text-lg">Hora de la sessió:</label>
           <select v-model="newSessionTime" class="border px-4 py-2 rounded w-full">
             <option value="" disabled>Selecciona una hora</option>
             <option value="16:00:00">16:00</option>
@@ -218,21 +217,21 @@ defineExpose({
           </select>
         </div>
         <div class="mb-4">
-          <label for="dia_espectador">¿Es día espectador?</label>
+          <label for="dia_espectador">És dia espectador?</label>
           <input v-model="isDiaEspectador" type="checkbox" />
         </div>
         <button type="submit">
-          Añadir sesión
+          Afegir sessió
         </button>
       </form>
     </div>
 
     <div v-if="sessions.length > 0" class="mt-6">
-      <h2 class="text-xl font-semibold">Sesiones disponibles</h2>
+      <h2 class="text-xl font-semibold">Sessions disponibles</h2>
       <ul class="list-disc ml-6">
         <li v-for="session in sessions" :key="session.id" class="flex justify-between items-center">
           <span>{{ session.session_date }} - {{ session.session_time }}</span>
-          <button @click="deleteSession(session.id)" class="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600" aria-label="Eliminar sesión">
+          <button @click="deleteSession(session.id)" class="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600" aria-label="Eliminar sessió">
             Eliminar
           </button>
         </li>
@@ -240,26 +239,29 @@ defineExpose({
     </div>
 
     <div v-if="loading" class="mt-6 text-blue-500 text-lg">
-      Cargando sesiones...
+      Carregant sessions...
     </div>
 
     <div v-else-if="selectedMovieId !== null && sessions.length === 0 && !loading" class="mt-6 text-gray-500 text-lg">
-      No hay sesiones disponibles para esta película.
+      No hi ha sessions disponibles per a aquesta pel·lícula.
     </div>
   </div>
 
   <div v-else class="text-center p-6 text-red-500 text-xl font-bold">
-    No tienes permisos para ver esta sección.
+    No tens permisos per veure aquesta secció.
   </div>
 
-  <!-- Popup de alerta -->
+  <!-- Popup d'alerta -->
   <div v-if="isVisible" class="alert-popup">
     <div class="alert-content">
       <p class="alert-message">{{ message }}</p>
-      <button @click="closeAlert" class="close-btn">Cerrar</button>
+      <button @click="closeAlert" class="close-btn">Tancar</button>
     </div>
   </div>
 </template>
+
+
+
 <style scoped>
 .back-link {
   display: inline-block;

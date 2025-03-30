@@ -3,72 +3,73 @@
 
   <div class="movie-page">
     <button @click="goBack" class="back-button">
-      ⬅ Volver
+      ⬅ Tornar
     </button>
     <div v-if="movie" class="movie-content">
-      <!-- Encabezado de la película -->
+      <!-- Capçalera de la pel·lícula -->
       <div class="movie-header">
         <h1 class="movie-title">{{ movie.title }}</h1>
 
         <div v-if="isLoading" class="loading-sessions">
-          Verificando disponibilidad...
+          Verificant disponibilitat...
         </div>
         <template v-else>
           <NuxtLink 
             v-if="isAvailableForStreaming && hasAvailableSessions" 
             :to="`/buy-ticket/${movie.id}`"
             class="btn-buy">
-            🎟️ Ver Butacas y Sesiones
+            🎟️ Veure Butaques i Sessions
           </NuxtLink>
           
-          <div v-else-if="isAvailableForStreaming && !hasAvailableSessions" class="proximamente">
-            🎬 No hay sesiones disponibles actualmente
+          <div v-else-if="isAvailableForStreaming && !hasAvailableSessions" class="proximament">
+            🎬 No hi ha sessions disponibles actualment
             <p class="subtext">
-              Lo sentimos, no hay funciones programadas para esta película.
+              Ho sentim, no hi ha funcions programades per a aquesta pel·lícula.
             </p>
           </div>
           
-          <div v-else class="proximamente">
-            🎬 No disponible actualmente
+          <div v-else class="proximament">
+            🎬 No disponible actualment
             <p class="subtext">
-              Esta película no está disponible en streaming.
+              Aquesta pel·lícula no està disponible en streaming.
             </p>
           </div>
         </template>
       </div>
 
-      <!-- Resto del contenido... -->
+      <!-- Resta del contingut... -->
       <div class="movie-main">
         <img :src="movie.poster_url" alt="Poster" class="movie-poster" />
         <div class="movie-info">
           <div class="details">
             <p><strong>Director:</strong> {{ movie.director }}</p>
-            <p><strong>Actores:</strong> {{ movie.actores }}</p>
-            <p><strong>Año:</strong> {{ movie.año }}</p>
-            <p><strong>Género:</strong> {{ movie.genero }}</p>
+            <p><strong>Actors:</strong> {{ movie.actores }}</p>
+            <p><strong>Any:</strong> {{ movie.año }}</p>
+            <p><strong>Gènere:</strong> {{ movie.genero }}</p>
             <p><strong>Idioma:</strong> {{ movie.idioma }}</p>
-            <p><strong>Subtítulos:</strong> {{ movie.subtitulos ? 'Sí' : 'No' }}</p>
-            <p><strong>Formato:</strong> {{ movie.formato }}</p>
+            <p><strong>Subtítols:</strong> {{ movie.subtitulos ? 'Sí' : 'No' }}</p>
+            <p><strong>Format:</strong> {{ movie.formato }}</p>
             <p><strong>Streaming:</strong> {{ movie.disponible_en_streaming === '1' ? 'Disponible' : 'No disponible' }}</p>
-            <p><strong>Duración:</strong> {{ movie.duracion }}</p>
+            <p><strong>Duració:</strong> {{ movie.duracion }}</p>
           </div>
         </div>
       </div>
 
       <div class="sinopsis">
-        <h4>Sinopsis</h4>
+        <h4>Sinopsi</h4>
         <p>{{ movie.sinopsis }}</p>
       </div>
 
       <div v-if="movie.trailer_url" class="trailer">
-        <h4>Tráiler</h4>
+        <h4>Tràiler</h4>
         <video :src="movie.trailer_url" controls class="vid-trailer"></video>
       </div>
     </div>
 
-    <div v-else class="loading">Cargando detalles de la película...</div>
+    <div v-else class="loading">Carregant detalls de la pel·lícula...</div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted } from 'vue';

@@ -24,7 +24,22 @@ class MovieSeeder extends Seeder
             'formato' => 'IMAX',
             'disponible_en_streaming' => true,
         ]);
-
+        Movie::create([
+            'title' => 'Holland',
+            'sinopsis' => 'En aquest thriller imprevisible, la Nicole Kidman es posa a la pell de la Nancy Vandergroot, una mestra i mestressa de casa de Holland, que veu com la seva vida de pel·lícula envoltada de tulipes, amb un marit essencial per a la comunitat i un fill, es transforma en una història turbulenta. La Nancy i un col·lega seu investiguem un secret quan s’adonen que no hi ha res autèntic a les seves vides.',
+            'duracion' => '108 minuts',
+            'director' => 'Mimi Cave',
+            'actores' => 'Nicole Kidman, Gael García Bernal, Matthew Macfadyen, Jude Hill, Jeff Pope, Isaac Krasner, Lennon Parham, Rachel Sennott, Chris Witaske',
+            'año' => 2025,
+            'genero' => 'Thriller, Mystery',
+            'poster_url' => 'https://tmdb.org/path/to/holland-poster.jpg',
+            'trailer_url' => 'https://tmdb.org/path/to/holland-trailer.mp4',
+            'idioma' => 'Anglès',
+            'subtitulos' => true,
+            'formato' => 'IMAX',
+            'disponible_en_streaming' => true,
+        ]);
+        
         Movie::create([
             'title' => 'Captain America: Brave New World',
             'sinopsis' => 'El nuevo Capitán América descubre un experimento genético que crea soldados mutantes incontrolables. Con aliados inesperados, debe detener esta amenaza antes que estos supersoldados destruyan ciudades enteras en un mundo donde los héroes se han vuelto parte del sistema político.',

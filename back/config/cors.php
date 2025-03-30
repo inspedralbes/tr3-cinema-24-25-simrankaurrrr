@@ -1,11 +1,13 @@
 
 <?php
 return [
-    'paths' => ['api/*'], // Rutas a las que se aplicará CORS
-    'allowed_methods' => ['*'], // Métodos permitidos (GET, POST, etc.)
-    'allowed_origins' => ['*'], // Orígenes permitidos
-    'allowed_headers' => ['*'], // Cabeceras permitidas
+    'paths' => ['api/*'],
+    'allowed_methods' => ['*'],
+    'allowed_origins' => 
+        ['http://mdvdcine.daw.inspedralbes.cat'],
+    'allowed_origins_patterns' => [],
+    'allowed_headers' => ['*'],
     'exposed_headers' => [],
     'max_age' => 0,
-    'supports_credentials' => true, // Habilita el soporte para credenciales
+    'supports_credentials' => true,
 ];

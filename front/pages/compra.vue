@@ -3,80 +3,81 @@
   
   <div class="compra-container">
     <button @click="goBack" class="back-button">
-      ⬅ Volver
+      ⬅ Tornar
     </button>
     <div class="content-wrapper">
       <div class="carrito-container">
-        <h2>Carrito de Reservas</h2>
+        <h2>Carro de Reserves</h2>
 
         <ul v-if="carrito.length > 0">
           <li v-for="(reserva, index) in carrito" :key="reserva.reserva_id">
-            <p>🎬 Película: {{ reserva.nombre_pelicula || 'Desconocida' }}</p>
-            <p>📍 Asiento: Fila {{ reserva.fila }}, Columna {{ reserva.columna }}</p>
-            <p>💲 Precio: {{ reserva.precio || 'No disponible' }} €</p>
+            <p>🎬 Pel·lícula: {{ reserva.nombre_pelicula || 'Desconeguda' }}</p>
+            <p>📍 Seient: Fila {{ reserva.fila }}, Columna {{ reserva.columna }}</p>
+            <p>💲 Preu: {{ reserva.precio || 'No disponible' }} €</p>
 
             <button @click="eliminarReserva(reserva.reserva_id, index)" class="btn-eliminar">❌ Eliminar</button>
             <button @click="mostrarFormularioPagoIndividual(reserva)" class="btn-pagar-individual">
-              💳 Pagar Individualmente
+              💳 Pagar Individualment
             </button>
 
             <div v-if="reserva.pagarIndividual" class="formulario-pago">
-              <h3>Ingrese sus Datos de Pago</h3>
-              <input v-model="reserva.datosPago.numero_tarjeta" placeholder="Número de Tarjeta" maxlength="16" class="input-form" />
+              <h3>Introduïu les vostres Dades de Pagament</h3>
+              <input v-model="reserva.datosPago.numero_tarjeta" placeholder="Número de Targeta" maxlength="16" class="input-form" />
               <input v-model="reserva.datosPago.fecha_vencimiento" placeholder="MM/YY" maxlength="5" class="input-form" />
               <input v-model="reserva.datosPago.cvv" placeholder="CVV" type="password" maxlength="3" class="input-form" />
 
-              <input v-model="reserva.datosPago.nombre" placeholder="Nombre" class="input-form" />
-              <input v-model="reserva.datosPago.apellido" placeholder="Apellido" class="input-form" />
-              <input v-model="reserva.datosPago.email" placeholder="Correo Electrónico" type="email" class="input-form" />
+              <input v-model="reserva.datosPago.nombre" placeholder="Nom" class="input-form" />
+              <input v-model="reserva.datosPago.apellido" placeholder="Cognom" class="input-form" />
+              <input v-model="reserva.datosPago.email" placeholder="Correu Electrònic" type="email" class="input-form" />
 
-              <button @click="realizarPagoIndividual(reserva)" :disabled="procesandoPago" class="btn-pago">Realizar Pago</button>
+              <button @click="realizarPagoIndividual(reserva)" :disabled="procesandoPago" class="btn-pago">Realitzar Pagament</button>
             </div>
           </li>
         </ul>
 
-        <p v-else>No tienes reservas en el carrito.</p>
+        <p v-else>No tens reserves al carro.</p>
 
         <p v-if="mensajeError" class="mensaje-error">{{ mensajeError }}</p>
 
         <div v-if="carrito.length > 0 && !mostrarFormulario">
           <button @click="mostrarFormulario = true" :disabled="procesandoPago" class="btn-pagar-todo">
-            💳 Pagar Todo
+            💳 Pagar Tot
           </button>
         </div>
 
         <div v-if="mostrarFormulario" class="formulario-pago">
-          <h3>Ingrese sus Datos de Pago</h3>
-          <input v-model="datosPago.numero_tarjeta" placeholder="Número de Tarjeta" maxlength="16" class="input-form" />
+          <h3>Introduïu les vostres Dades de Pagament</h3>
+          <input v-model="datosPago.numero_tarjeta" placeholder="Número de Targeta" maxlength="16" class="input-form" />
           <input v-model="datosPago.fecha_vencimiento" placeholder="MM/YY" maxlength="5" class="input-form" />
           <input v-model="datosPago.cvv" placeholder="CVV" type="password" maxlength="3" class="input-form" />
 
-          <input v-model="datosPago.nombre" placeholder="Nombre" class="input-form" />
-          <input v-model="datosPago.apellido" placeholder="Apellido" class="input-form" />
-          <input v-model="datosPago.email" placeholder="Correo Electrónico" type="email" class="input-form" />
+          <input v-model="datosPago.nombre" placeholder="Nom" class="input-form" />
+          <input v-model="datosPago.apellido" placeholder="Cognom" class="input-form" />
+          <input v-model="datosPago.email" placeholder="Correu Electrònic" type="email" class="input-form" />
 
-          <button @click="realizarPago" :disabled="procesandoPago" class="btn-pago">Realizar Pago</button>
+          <button @click="realizarPago" :disabled="procesandoPago" class="btn-pago">Realitzar Pagament</button>
           <p v-if="mensaje" class="mensaje">{{ mensaje }}</p>
         </div>
       </div>
 
       <div v-if="procesandoPago" class="popup">
         <div class="popup-content">
-          <h2>⏳ Procesando pago...</h2>
-          <p>Por favor espera mientras procesamos tu pago.</p>
+          <h2>⏳ Processant pagament...</h2>
+          <p>Si us plau espera mentre processem el teu pagament.</p>
         </div>
       </div>
 
       <div v-if="mensajeConfirmacion" class="popup">
         <div class="popup-content">
-          <h2>✅ ¡Pago exitoso!</h2>
-          <p>Se ha enviado un correo con tu justificante de la entrada.</p>
-          <button @click="cerrarPopUp" class="btn-aceptar">Aceptar</button>
+          <h2>✅ ¡Pagament realitzat amb èxit!</h2>
+          <p>S'ha enviat un correu amb el teu justificant de l'entrada.</p>
+          <button @click="cerrarPopUp" class="btn-aceptar">Acceptar</button>
         </div>
       </div>
     </div>
   </div>
 </template>
+
 
 <script>
 import communicationManager from '@/services/communicationManager';

@@ -3,39 +3,39 @@
 
     <div class="my-tickets-page">
         <button @click="goBack" class="back-button">
-            ⬅ Volver
+            ⬅ Tornar
         </button>
         <div class="tickets-container">
-            <h1>Mis Entradas</h1>
+            <h1>Les Meves Entrades</h1>
 
             <div class="tabs">
                 <button @click="activeTab = 'future'" :class="{ active: activeTab === 'future' }">
-                    🎟️ Próximas
+                    🎟️ Pròximes
                 </button>
                 <button @click="activeTab = 'pending'" :class="{ active: activeTab === 'pending' }">
-                    ⏳ En Proceso
+                    ⏳ En Procés
                 </button>
                 <button @click="activeTab = 'past'" :class="{ active: activeTab === 'past' }">
-                    📜 Histórico
+                    📜 Històric
                 </button>
             </div>
 
             <div v-if="loading" class="loading">
                 <div class="spinner"></div>
-                <p>Cargando tus entradas...</p>
+                <p>Carregant les teves entrades...</p>
             </div>
 
             <div v-else-if="error" class="error-message">
-                <p>⚠️ Error al cargar tus entradas: {{ error }}</p>
+                <p>⚠️ Error en carregar les teves entrades: {{ error }}</p>
                 <button @click="fetchTickets" class="retry-btn">Reintentar</button>
             </div>
 
             <div v-else>
-                <!-- Entradas Futuras -->
+                <!-- Entrades Futures -->
                 <div v-if="activeTab === 'future'">
                     <div class="section-header">
-                        <h2>🎬 Tus Próximas Entradas</h2>
-                        <p>Estas son las entradas para tus próximas sesiones de cine</p>
+                        <h2>🎬 Les Teves Pròximes Entrades</h2>
+                        <p>Aquestes són les entrades per a les teves pròximes sessions de cinema</p>
                     </div>
 
                     <div v-if="futureTickets.length > 0" class="tickets-grid">
@@ -51,18 +51,18 @@
                                 </div>
 
                                 <div class="ticket-details">
-                                    <p><strong>📅 Fecha:</strong> {{ formatDate(ticket.session_date) }}</p>
+                                    <p><strong>📅 Data:</strong> {{ formatDate(ticket.session_date) }}</p>
                                     <p><strong>🕒 Hora:</strong> {{ ticket.session_time }}</p>
-                                    <p><strong>💺 Butacas:</strong> {{ formatSeats(ticket.butaca_ids) }}</p>
+                                    <p><strong>💺 Seients:</strong> {{ formatSeats(ticket.butaca_ids) }}</p>
                                     <p><strong>💰 Total:</strong> {{ formatPrice(ticket.total_amount) }}</p>
                                 </div>
 
                                 <div class="ticket-actions">
                                     <button class="action-btn view-btn" @click="viewMovie(ticket.movie_id)">
-                                        Ver Película
+                                        Veure Pel·lícula
                                     </button>
                                     <button class="action-btn download-btn" @click="downloadTicket(ticket.id)">
-                                        Descargar Entrada
+                                        Descarregar Entrada
                                     </button>
                                 </div>
                             </div>
@@ -70,16 +70,16 @@
                     </div>
 
                     <div v-else class="empty-section">
-                        <p>No tienes entradas para próximas sesiones</p>
-                        <router-link to="/" class="browse-btn">Explorar Películas</router-link>
+                        <p>No tens entrades per a pròximes sessions</p>
+                        <router-link to="/" class="browse-btn">Explorar Pel·lícules</router-link>
                     </div>
                 </div>
 
-                <!-- Reservas en Proceso -->
+                <!-- Reserves en Procés -->
                 <div v-if="activeTab === 'pending'">
                     <div class="section-header">
-                        <h2>⏳ Reservas en Proceso</h2>
-                        <p>Estas entradas están en tu carrito pendientes de confirmación</p>
+                        <h2>⏳ Reserves en Procés</h2>
+                        <p>Aquestes entrades estan al teu carret pendents de confirmació</p>
                     </div>
 
                     <div v-if="pendingTickets.length > 0" class="tickets-grid">
@@ -88,25 +88,25 @@
                                 <img :src="reserva.movie_poster || 'https://via.placeholder.com/300x450'"
                                     :alt="reserva.movie_title">
                                 <div class="pending-overlay">
-                                    <span>En Carrito</span>
+                                    <span>Al Carret</span>
                                 </div>
                             </div>
                             <div class="ticket-info">
                                 <div class="ticket-header">
                                     <h3>{{ reserva.movie_title }}</h3>
-                                    <span class="ticket-status pending">Reservado</span>
+                                    <span class="ticket-status pending">Reservada</span>
                                 </div>
 
                                 <div class="ticket-details">
-                                    <p><strong>📅 Fecha:</strong> {{ formatDate(reserva.session_date) }}</p>
+                                    <p><strong>📅 Data:</strong> {{ formatDate(reserva.session_date) }}</p>
                                     <p><strong>🕒 Hora:</strong> {{ reserva.session_time }}</p>
-                                    <p><strong>💺 Butaca:</strong> {{ formatSeat(reserva.butaca) }}</p>
-                                    <p><strong>💰 Precio:</strong> {{ formatPrice(reserva.total_amount) }}</p>
+                                    <p><strong>💺 Seient:</strong> {{ formatSeat(reserva.butaca) }}</p>
+                                    <p><strong>💰 Preu:</strong> {{ formatPrice(reserva.total_amount) }}</p>
                                 </div>
 
                                 <div class="ticket-actions">
                                     <button class="action-btn pay-btn" @click="completePayment()">
-                                        Completar Pago
+                                        Completar Pagament
                                     </button>
                                     <button class="action-btn cancel-btn" @click="eliminarReserva(reserva)">
                                         ❌ Eliminar
@@ -117,87 +117,15 @@
                     </div>
 
                     <div v-else class="empty-section">
-                        <p>No tienes reservas en tu carrito</p>
-                        <router-link to="/" class="browse-btn">Explorar Películas</router-link>
-                    </div>
-                </div>
-
-                <!-- Entradas Pasadas -->
-                <div v-if="activeTab === 'past'">
-                    <div class="section-header">
-                        <h2>📜 Histórico de Entradas</h2>
-                        <p>Estas son las entradas para sesiones que ya han pasado</p>
-                    </div>
-
-                    <div v-if="pastTickets.length > 0" class="tickets-grid">
-                        <div v-for="ticket in pastTickets" :key="ticket.id" class="ticket-card past">
-                            <div class="ticket-poster">
-                                <img :src="ticket.movie_poster || 'https://via.placeholder.com/300x450'"
-                                    :alt="ticket.movie_title">
-                                <div class="past-overlay">
-                                    <span>Pasada</span>
-                                </div>
-                            </div>
-                            <div class="ticket-info">
-                                <div class="ticket-header">
-                                    <h3>{{ ticket.movie_title }}</h3>
-                                    <span class="ticket-status used">Usada</span>
-                                </div>
-
-                                <div class="ticket-details">
-                                    <p><strong>📅 Fecha:</strong> {{ formatDate(ticket.session_date) }}</p>
-                                    <p><strong>🕒 Hora:</strong> {{ ticket.session_time }}</p>
-                                    <p><strong>💺 Butacas:</strong> {{ formatSeats(ticket.butaca_ids) }}</p>
-                                    <p><strong>💰 Total:</strong> {{ formatPrice(ticket.total_amount) }}</p>
-                                    <p v-if="ticket.rating" class="rating-display">
-                                        <strong>⭐ Valoración:</strong>
-                                        <span class="stars">{{ getStars(ticket.rating) }}</span>
-                                        ({{ ticket.rating }}/5)
-                                    </p>
-                                </div>
-
-                                <div class="ticket-actions">
-                                    <button class="action-btn view-btn" @click="viewMovie(ticket.movie_id)">
-                                        Ver Película
-                                    </button>
-                                    <button class="action-btn receipt-btn" @click="downloadReceipt(ticket.id)">
-                                        Descargar Factura
-                                    </button>
-                                    <button class="rate-btn" @click="showRatingModal(ticket)">
-                                        {{ ticket.rating ? 'Cambiar Valoración' : 'Valorar Película' }}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div v-else class="empty-section">
-                        <p>No tienes entradas en tu historico</p>
-                        <router-link to="/" class="browse-btn">Explorar Películas</router-link>
-                    </div>
-                </div>
-
-                <!-- Modal de valoración -->
-                <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
-                    <div class="modal-content">
-                        <h3>Valorar {{ currentMovieTitle }}</h3>
-                        <div class="rating-stars">
-                            <span v-for="star in 5" :key="star" @click="setRating(star)"
-                                :class="{ 'active': star <= currentRating }">
-                                ★
-                            </span>
-                        </div>
-                        <p>Seleccionaste: {{ currentRating }} estrellas</p>
-                        <div class="modal-actions">
-                            <button @click="submitRating" class="modal-btn confirm">Confirmar</button>
-                            <button @click="closeModal" class="modal-btn cancel">Cancelar</button>
-                        </div>
+                        <p>No tens reserves al teu carret</p>
+                        <router-link to="/" class="browse-btn">Explorar Pel·lícules</router-link>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </template>
+
 
 <script>
 import { ref, onMounted, computed } from 'vue';

@@ -1,5 +1,5 @@
 # 🎬 MDVD CINEMES |  📝 DEMO
-👉 Fes clic en imatge per veure la demostració
+👉 Clica a la imatge per veure la demostració 
 
 [![Demo](image.png)](https://youtu.be/zmet-AdSK9w?si=33pcTUKXYA0iDL3c)
 
